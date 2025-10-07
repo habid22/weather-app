@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import { MapPin, Navigation, Loader2 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useRef } from 'react';
+import { Navigation, Loader2 } from 'lucide-react';
+import { motion } from 'framer-motion';
+// Removed static database import - we'll use direct API search
 
 interface LocationInputProps {
   onLocationSelect: (location: string) => void;
@@ -18,72 +19,22 @@ export default function LocationInput({
   placeholder = "Enter city, ZIP code, or coordinates..."
 }: LocationInputProps) {
   const [input, setInput] = useState('');
-  const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
+  // Removed suggestion state - no longer needed
   const [isGettingLocation, setIsGettingLocation] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const debounceRef = useRef<NodeJS.Timeout>();
+  // Removed debounce ref - no longer needed for autocomplete
 
-  // Common location suggestions
-  const commonLocations = [
-    'New York, NY',
-    'Los Angeles, CA',
-    'Chicago, IL',
-    'Houston, TX',
-    'Phoenix, AZ',
-    'Philadelphia, PA',
-    'San Antonio, TX',
-    'San Diego, CA',
-    'Dallas, TX',
-    'San Jose, CA',
-    'London, UK',
-    'Paris, France',
-    'Tokyo, Japan',
-    'Sydney, Australia',
-    'Toronto, Canada',
-  ];
-
-  useEffect(() => {
-    if (input.length > 2) {
-      // Clear previous debounce
-      if (debounceRef.current) {
-        clearTimeout(debounceRef.current);
-      }
-
-      // Set new debounce
-      debounceRef.current = setTimeout(() => {
-        const filtered = commonLocations.filter(location =>
-          location.toLowerCase().includes(input.toLowerCase())
-        );
-        setSuggestions(filtered.slice(0, 5));
-        setShowSuggestions(true);
-      }, 300);
-    } else {
-      setSuggestions([]);
-      setShowSuggestions(false);
-    }
-
-    return () => {
-      if (debounceRef.current) {
-        clearTimeout(debounceRef.current);
-      }
-    };
-  }, [input]);
+  // Removed static database search - users can type any city name directly
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (input.trim()) {
       onLocationSelect(input.trim());
       setInput('');
-      setShowSuggestions(false);
     }
   };
 
-  const handleSuggestionClick = (suggestion: string) => {
-    setInput(suggestion);
-    onLocationSelect(suggestion);
-    setShowSuggestions(false);
-  };
+  // Removed suggestion click handler - no longer needed
 
   const handleCurrentLocation = async () => {
     setIsGettingLocation(true);
@@ -99,7 +50,6 @@ export default function LocationInput({
     return coordPattern.test(text.trim());
   };
 
-
   return (
     <div className="relative w-full max-w-md mx-auto">
       <form onSubmit={handleSubmit} className="relative">
@@ -109,9 +59,9 @@ export default function LocationInput({
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onFocus={() => setShowSuggestions(input.length > 2)}
-            onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-            placeholder={placeholder}
+            onFocus={() => {}}
+            onBlur={() => {}}
+            placeholder="Search any location..."
             className="w-full pl-4 pr-20 py-3 input-dark"
             disabled={isLoading}
           />
@@ -133,30 +83,7 @@ export default function LocationInput({
         </div>
       </form>
 
-      <AnimatePresence>
-        {showSuggestions && suggestions.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="absolute top-full left-0 right-0 mt-2 bg-card rounded-xl shadow-xl border border-subtle z-50 max-h-60 overflow-y-auto"
-          >
-            {suggestions.map((suggestion, index) => (
-              <motion.button
-                key={suggestion}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.05 }}
-                onClick={() => handleSuggestionClick(suggestion)}
-                className="w-full px-4 py-3 text-left hover:bg-accent transition-colors duration-150 flex items-center space-x-3"
-              >
-                <MapPin className="w-4 h-4 text-muted" />
-                <span className="text-foreground font-medium">{suggestion}</span>
-              </motion.button>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Removed static suggestions - users can type any city name directly */}
 
       {/* Input type indicator */}
       {input && (

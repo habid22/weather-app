@@ -54,7 +54,7 @@ export class WeatherService {
         feelsLike: Math.round(data.current.feelslike_c),
         humidity: data.current.humidity,
         pressure: data.current.pressure_mb,
-        windSpeed: data.current.wind_kph / 3.6, // Convert km/h to m/s
+        windSpeed: Math.round((data.current.wind_kph / 3.6) * 10) / 10, // Convert km/h to m/s and round to 1 decimal
         windDirection: data.current.wind_degree,
         description: data.current.condition.text,
         icon: data.current.condition.icon,

@@ -7,18 +7,13 @@ import WeatherCard from '@/components/WeatherCard';
 import WeatherDetails from '@/components/WeatherDetails';
 import ErrorDisplay from '@/components/ErrorDisplay';
 import { useLocation } from '@/hooks/useLocation';
-import { Cloud, Info } from 'lucide-react';
+import { Cloud } from 'lucide-react';
 
 export default function Home() {
   const { currentLocation, weatherData, isLoading, error, searchLocation, getCurrentLocation, clearError } = useLocation();
-  const [showInfo, setShowInfo] = useState(false);
 
   return (
     <div className="min-h-screen bg-dark">
-      {/* Subtle background pattern */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-white/[0.01] rounded-full blur-3xl"></div>
-      </div>
 
       {/* Header */}
       <header className="relative z-10 p-6">
@@ -37,17 +32,6 @@ export default function Home() {
             </div>
           </motion.div>
 
-          <motion.button
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setShowInfo(!showInfo)}
-            className="p-2 bg-card text-foreground rounded-lg border border-subtle hover:bg-accent transition-colors duration-200"
-            title="About PM Accelerator"
-          >
-            <Info className="w-6 h-6" />
-          </motion.button>
         </div>
       </header>
 
@@ -116,6 +100,33 @@ export default function Home() {
                 />
                 
                 <WeatherDetails weather={weatherData} />
+                
+                {/* 5-Day Forecast */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3, duration: 0.5 }}
+                  className="bg-card p-6 rounded-xl shadow-lg border border-subtle"
+                >
+                  <h3 className="text-2xl font-semibold text-foreground mb-6">5-Day Forecast</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                    {weatherData.forecast.map((day, index) => (
+                      <motion.div
+                        key={day.date}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 + 0.4 }}
+                        className="flex flex-col items-center p-4 bg-background rounded-lg border border-subtle text-center"
+                      >
+                        <p className="text-sm text-muted mb-1">{new Date(day.date).toLocaleDateString('en-US', { weekday: 'short' })}</p>
+                        <img src={`https:${day.icon}`} alt={day.description} className="w-12 h-12 mb-2" />
+                        <p className="text-lg font-bold text-foreground">{day.temperature.max}°C</p>
+                        <p className="text-sm text-muted">{day.temperature.min}°C</p>
+                        <p className="text-xs text-muted mt-1">{day.description}</p>
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
               </motion.div>
             )}
           </AnimatePresence>
@@ -123,48 +134,6 @@ export default function Home() {
         </div>
       </main>
 
-      {/* Info Modal */}
-      <AnimatePresence>
-        {showInfo && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-6"
-            onClick={() => setShowInfo(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-card rounded-2xl p-8 max-w-md w-full shadow-2xl border border-subtle"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <h3 className="text-2xl font-semibold mb-4 text-foreground">About PM Accelerator</h3>
-              <p className="text-muted mb-6 font-medium">
-                PM Accelerator is a comprehensive program designed to accelerate your career in product management. 
-                We provide hands-on training, mentorship, and real-world experience to help you become a successful product manager.
-              </p>
-              <div className="flex space-x-3">
-                <a
-                  href="https://www.linkedin.com/company/product-manager-accelerator"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 btn-primary text-center"
-                >
-                  Visit LinkedIn
-                </a>
-                <button
-                  onClick={() => setShowInfo(false)}
-                  className="btn-secondary"
-                >
-                  Close
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }
