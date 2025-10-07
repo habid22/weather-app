@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Search, MapPin, Navigation, Loader2 } from 'lucide-react';
+import { MapPin, Navigation, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface LocationInputProps {
@@ -99,20 +99,11 @@ export default function LocationInput({
     return coordPattern.test(text.trim());
   };
 
-  const getInputIcon = () => {
-    if (isCoordinateInput(input)) {
-      return <MapPin className="w-5 h-5 text-blue-500" />;
-    }
-    return <Search className="w-5 h-5 text-gray-400" />;
-  };
 
   return (
     <div className="relative w-full max-w-md mx-auto">
       <form onSubmit={handleSubmit} className="relative">
         <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            {getInputIcon()}
-          </div>
           <input
             ref={inputRef}
             type="text"
@@ -121,15 +112,15 @@ export default function LocationInput({
             onFocus={() => setShowSuggestions(input.length > 2)}
             onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
             placeholder={placeholder}
-            className="w-full pl-10 pr-20 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200 bg-white/80 backdrop-blur-sm shadow-lg"
+            className="w-full pl-4 pr-20 py-3 input-dark"
             disabled={isLoading}
           />
-          <div className="absolute inset-y-0 right-0 flex items-center pr-2">
+          <div className="absolute inset-y-0 right-0 flex items-center pr-3 z-10">
             <button
               type="button"
               onClick={handleCurrentLocation}
               disabled={isGettingLocation || isLoading}
-              className="p-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+              className="p-2 rounded-lg bg-card text-foreground border border-subtle hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
               title="Use current location"
             >
               {isGettingLocation ? (
@@ -148,7 +139,7 @@ export default function LocationInput({
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-gray-200 z-50 max-h-60 overflow-y-auto"
+            className="absolute top-full left-0 right-0 mt-2 bg-card rounded-xl shadow-xl border border-subtle z-50 max-h-60 overflow-y-auto"
           >
             {suggestions.map((suggestion, index) => (
               <motion.button
@@ -157,10 +148,10 @@ export default function LocationInput({
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05 }}
                 onClick={() => handleSuggestionClick(suggestion)}
-                className="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors duration-150 flex items-center space-x-3"
+                className="w-full px-4 py-3 text-left hover:bg-accent transition-colors duration-150 flex items-center space-x-3"
               >
-                <MapPin className="w-4 h-4 text-gray-400" />
-                <span className="text-gray-700">{suggestion}</span>
+                <MapPin className="w-4 h-4 text-muted" />
+                <span className="text-foreground font-medium">{suggestion}</span>
               </motion.button>
             ))}
           </motion.div>
@@ -172,12 +163,12 @@ export default function LocationInput({
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mt-2 text-sm text-gray-500 text-center"
+          className="mt-2 text-sm text-muted text-center font-medium"
         >
           {isCoordinateInput(input) ? (
-            <span className="text-blue-600">📍 Coordinates detected</span>
+            <span className="text-foreground">📍 Coordinates detected</span>
           ) : (
-            <span className="text-gray-500">🏙️ City or location</span>
+            <span className="text-muted">🏙️ City or location</span>
           )}
         </motion.div>
       )}

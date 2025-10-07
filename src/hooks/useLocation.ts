@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { WeatherService } from '@/lib/weatherService';
 import { GeolocationService } from '@/lib/geolocation';
 import { LocationValidator } from '@/lib/locationUtils';
 import { LocationData, WeatherData } from '@/types/weather';
@@ -37,8 +36,15 @@ export function useLocation(): UseLocationReturn {
         throw new Error(validation.error || 'Invalid location format');
       }
 
-      // Get weather data
-      const result = await WeatherService.getWeatherByLocation(validation.normalizedInput);
+      // Call our API route
+      const response = await fetch(`/api/weather?location=${encodeURIComponent(validation.normalizedInput)}`);
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to fetch weather data');
+      }
+
+      const result = await response.json();
       
       setCurrentLocation(result.location);
       setWeatherData(result.weather);
@@ -59,21 +65,18 @@ export function useLocation(): UseLocationReturn {
       // Get current position
       const coords = await GeolocationService.getCurrentPosition();
       
-      // Get weather data for current location
-      const weather = await WeatherService.getWeatherData(coords.latitude, coords.longitude);
+      // Call our API route with coordinates
+      const response = await fetch(`/api/weather?lat=${coords.latitude}&lon=${coords.longitude}`);
       
-      // Get location name
-      const locationName = await GeolocationService.getLocationName(coords.latitude, coords.longitude);
-      
-      const locationData: LocationData = {
-        name: locationName,
-        latitude: coords.latitude,
-        longitude: coords.longitude,
-        country: 'Unknown',
-      };
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to fetch weather data');
+      }
 
-      setCurrentLocation(locationData);
-      setWeatherData(weather);
+      const result = await response.json();
+      
+      setCurrentLocation(result.location);
+      setWeatherData(result.weather);
     } catch (err: any) {
       setError(err.message || 'Failed to get current location');
       setCurrentLocation(null);
