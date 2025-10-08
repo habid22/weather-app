@@ -125,8 +125,8 @@ export async function POST(request: NextRequest) {
       latitude: weatherData.location.latitude,
       longitude: weatherData.location.longitude,
       dateRange: {
-        start: start,
-        end: end
+        start: new Date(startDate + 'T00:00:00.000Z'),
+        end: new Date(endDate + 'T00:00:00.000Z')
       },
       temperatureData: {
         current: weatherData.weather.current.temperature,
@@ -152,10 +152,10 @@ export async function POST(request: NextRequest) {
       dailyData: isHistorical && (weatherData as any).dailyHistoricalData ? (weatherData as any).dailyHistoricalData.map((day: any) => ({
         date: new Date(day.date),
         temperature: {
-          current: day.current,
+          current: day.temperature.current,
           min: day.temperature.min,
           max: day.temperature.max,
-          feelsLike: day.feelsLike
+          feelsLike: day.temperature.feelsLike
         },
         humidity: day.humidity,
         pressure: day.pressure,

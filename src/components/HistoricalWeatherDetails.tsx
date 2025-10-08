@@ -34,7 +34,12 @@ export default function HistoricalWeatherDetails({
   dateRange 
 }: HistoricalWeatherDetailsProps) {
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    // Extract date parts to avoid timezone issues
+    const datePart = dateString.split('T')[0];
+    const [year, month, day] = datePart.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+    
+    return date.toLocaleDateString('en-US', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
@@ -43,7 +48,18 @@ export default function HistoricalWeatherDetails({
   };
 
   const formatDayAndDate = (dateString: string) => {
-    const date = new Date(dateString);
+    // Handle both ISO strings and Date objects
+    let date: Date;
+    
+    if (typeof dateString === 'string') {
+      // If it's an ISO string, extract the date part to avoid timezone issues
+      const datePart = dateString.split('T')[0];
+      const [year, month, day] = datePart.split('-').map(Number);
+      date = new Date(year, month - 1, day);
+    } else {
+      // If it's already a Date object, use it directly
+      date = dateString;
+    }
     
     // Check if date is valid
     if (isNaN(date.getTime())) {

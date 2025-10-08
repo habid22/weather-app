@@ -42,9 +42,15 @@ export default function WeatherRecordsManager({ onClose }: WeatherRecordsManager
 
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
-  const [editingRecord, setEditingRecord] = useState<string | null>(null);
+  const [editingRecord, setEditingRecord] = useState<WeatherRecord | null>(null);
   const [selectedRecord, setSelectedRecord] = useState<WeatherRecord | null>(null);
   const [formData, setFormData] = useState({
+    location: '',
+    startDate: '',
+    endDate: '',
+    updateWeatherData: false
+  });
+  const [editFormData, setEditFormData] = useState({
     location: '',
     startDate: '',
     endDate: '',
@@ -75,6 +81,38 @@ export default function WeatherRecordsManager({ onClose }: WeatherRecordsManager
     }
   };
 
+  const handleEditRecord = (record: WeatherRecord) => {
+    // Extract date part directly from ISO string to avoid timezone issues
+    const startDateStr = record.dateRange.start.split('T')[0];
+    const endDateStr = record.dateRange.end.split('T')[0];
+    
+    setEditFormData({
+      location: record.location,
+      startDate: startDateStr,
+      endDate: endDateStr,
+      updateWeatherData: false
+    });
+    setEditingRecord(record);
+  };
+
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingRecord) return;
+    
+    try {
+      await updateRecord(editingRecord._id, {
+        location: editFormData.location,
+        startDate: editFormData.startDate,
+        endDate: editFormData.endDate,
+        updateWeatherData: editFormData.updateWeatherData
+      });
+      setEditingRecord(null);
+      setEditFormData({ location: '', startDate: '', endDate: '', updateWeatherData: false });
+    } catch (error) {
+      // Error is handled by the hook
+    }
+  };
+
   const handleDeleteRecord = async (id: string) => {
     if (confirm('Are you sure you want to delete this weather record?')) {
       try {
@@ -86,7 +124,12 @@ export default function WeatherRecordsManager({ onClose }: WeatherRecordsManager
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    // Extract just the date part to avoid timezone issues
+    const datePart = dateString.split('T')[0];
+    const [year, month, day] = datePart.split('-');
+    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    
+    return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'
@@ -240,7 +283,7 @@ export default function WeatherRecordsManager({ onClose }: WeatherRecordsManager
                         <Eye className="w-4 h-4 text-muted" />
                       </button>
                       <button
-                        onClick={() => setEditingRecord(record._id)}
+                        onClick={() => handleEditRecord(record)}
                         className="p-1 rounded hover:bg-accent transition-colors"
                         title="Edit record"
                       >
@@ -382,14 +425,14 @@ export default function WeatherRecordsManager({ onClose }: WeatherRecordsManager
                           <>
                             <History className="w-4 h-4 text-orange-500" />
                             <span className="text-orange-700 dark:text-orange-300 font-medium">
-                              Historical weather data will be fetched
+                              Historical weather data will be fetched for the new date range
                             </span>
                           </>
                         ) : (
                           <>
                             <Clock className="w-4 h-4 text-blue-500" />
                             <span className="text-blue-700 dark:text-blue-300 font-medium">
-                              Current weather data will be fetched
+                              Current weather data will be fetched for the new date range
                             </span>
                           </>
                         )}
@@ -410,6 +453,116 @@ export default function WeatherRecordsManager({ onClose }: WeatherRecordsManager
                       className="px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors"
                     >
                       {loading ? 'Creating...' : 'Create Record'}
+                    </button>
+                  </div>
+                </form>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* Edit Form Modal */}
+        <AnimatePresence>
+          {editingRecord && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-60">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="bg-card rounded-xl shadow-2xl border border-subtle w-full max-w-md"
+              >
+                <div className="p-6 border-b border-subtle">
+                  <h3 className="text-xl font-bold text-foreground">Edit Weather Record</h3>
+                  <p className="text-sm text-muted mt-1">
+                    Update the location and date range for this weather record.
+                  </p>
+                </div>
+                <form onSubmit={handleEditSubmit} className="p-6 space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-2">Location</label>
+                    <input
+                      type="text"
+                      value={editFormData.location}
+                      onChange={(e) => setEditFormData({ ...editFormData, location: e.target.value })}
+                      placeholder="Enter city, coordinates, or landmark..."
+                      className="w-full p-3 rounded-lg bg-background border border-subtle text-foreground"
+                      required
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-foreground mb-2">Start Date</label>
+                      <input
+                        type="date"
+                        value={editFormData.startDate}
+                        onChange={(e) => setEditFormData({ ...editFormData, startDate: e.target.value })}
+                        className="w-full p-3 rounded-lg bg-background border border-subtle text-foreground"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-foreground mb-2">End Date</label>
+                      <input
+                        type="date"
+                        value={editFormData.endDate}
+                        onChange={(e) => setEditFormData({ ...editFormData, endDate: e.target.value })}
+                        className="w-full p-3 rounded-lg bg-background border border-subtle text-foreground"
+                        required
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Data Type Indicator */}
+                  {editFormData.startDate && editFormData.endDate && (
+                    <div className="p-3 rounded-lg bg-background border border-subtle">
+                      <div className="flex items-center space-x-2">
+                        {new Date(editFormData.endDate) < new Date() ? (
+                          <>
+                            <History className="w-4 h-4 text-orange-500" />
+                            <span className="text-orange-700 dark:text-orange-300 font-medium">
+                              Historical weather data will be fetched for the new date range
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <Clock className="w-4 h-4 text-blue-500" />
+                            <span className="text-blue-700 dark:text-blue-300 font-medium">
+                              Current weather data will be fetched for the new date range
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Update Weather Data Option */}
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="updateWeatherData"
+                      checked={editFormData.updateWeatherData}
+                      onChange={(e) => setEditFormData({ ...editFormData, updateWeatherData: e.target.checked })}
+                      className="rounded border border-subtle"
+                    />
+                    <label htmlFor="updateWeatherData" className="text-sm text-foreground">
+                      Update weather data (fetch fresh data from API)
+                    </label>
+                  </div>
+                  
+                  <div className="flex items-center justify-end space-x-3">
+                    <button
+                      type="button"
+                      onClick={() => setEditingRecord(null)}
+                      className="px-4 py-2 rounded-lg bg-background border border-subtle hover:bg-accent transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors"
+                    >
+                      {loading ? 'Updating...' : 'Update Record'}
                     </button>
                   </div>
                 </form>

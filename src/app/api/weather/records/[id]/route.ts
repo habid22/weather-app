@@ -100,8 +100,8 @@ export async function PUT(
 
     // Update date range if provided
     if (startDate || endDate) {
-      const start = startDate ? new Date(startDate) : existingRecord.dateRange.start;
-      const end = endDate ? new Date(endDate) : existingRecord.dateRange.end;
+      const start = startDate ? new Date(startDate + 'T00:00:00.000Z') : existingRecord.dateRange.start;
+      const end = endDate ? new Date(endDate + 'T00:00:00.000Z') : existingRecord.dateRange.end;
       const now = new Date();
 
       if (start >= end) {
@@ -119,6 +119,54 @@ export async function PUT(
       }
 
       updateData.dateRange = { start, end };
+      
+      // Automatically fetch new weather data when date range changes
+      try {
+        const weatherResponse = await WeatherService.getWeatherByLocationAndDateRange(
+          existingRecord.location,
+          startDate || existingRecord.dateRange.start.toISOString().split('T')[0],
+          endDate || existingRecord.dateRange.end.toISOString().split('T')[0]
+        );
+
+        if (weatherResponse) {
+          updateData.temperatureData = {
+            current: weatherResponse.weather.current.temperature,
+            min: Math.min(...weatherResponse.weather.forecast.map(f => f.temperature.min)),
+            max: Math.max(...weatherResponse.weather.forecast.map(f => f.temperature.max)),
+            feelsLike: weatherResponse.weather.current.feelsLike,
+            humidity: weatherResponse.weather.current.humidity,
+            pressure: weatherResponse.weather.current.pressure,
+            windSpeed: weatherResponse.weather.current.windSpeed,
+            windDirection: weatherResponse.weather.current.windDirection,
+            description: weatherResponse.weather.current.description,
+            icon: weatherResponse.weather.current.icon
+          };
+          updateData.forecast = weatherResponse.weather.forecast.map(day => ({
+            date: new Date(day.date),
+            temperature: {
+              min: day.temperature.min,
+              max: day.temperature.max
+            },
+            description: day.description,
+            icon: day.icon
+          }));
+          
+          // Update historical data fields if it's historical data
+          if (weatherResponse.isHistorical) {
+            updateData.isHistorical = true;
+            // Store the daily historical data
+            updateData.dailyData = weatherResponse.dailyData || [];
+          } else {
+            updateData.isHistorical = false;
+            updateData.dailyData = [];
+          }
+        }
+      } catch (error: any) {
+        return NextResponse.json(
+          { success: false, error: `Failed to fetch weather data for new date range: ${error.message}` },
+          { status: 400 }
+        );
+      }
     }
 
     // Update the record
