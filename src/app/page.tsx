@@ -7,6 +7,7 @@ import WeatherCard from '@/components/WeatherCard';
 import WeatherDetails from '@/components/WeatherDetails';
 import ErrorDisplay from '@/components/ErrorDisplay';
 import WeatherRecordsManager from '@/components/WeatherRecordsManager';
+import Mapbox3DMap from '@/components/Mapbox3DMap';
 import { useLocation } from '@/hooks/useLocation';
 import { Cloud, Database } from 'lucide-react';
 
@@ -115,8 +116,6 @@ export default function Home() {
                   isLoading={isLoading}
                 />
                 
-                <WeatherDetails weather={weatherData} />
-                
                 {/* 5-Day Forecast */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
@@ -143,6 +142,14 @@ export default function Home() {
                     ))}
                   </div>
                 </motion.div>
+                
+                <Mapbox3DMap
+                  location={currentLocation.name}
+                  latitude={currentLocation.latitude}
+                  longitude={currentLocation.longitude}
+                />
+                
+                <WeatherDetails weather={weatherData} />
               </motion.div>
             )}
           </AnimatePresence>

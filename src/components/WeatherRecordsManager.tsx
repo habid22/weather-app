@@ -113,6 +113,7 @@ export default function WeatherRecordsManager({ onClose }: WeatherRecordsManager
     }
   };
 
+
   const handleDeleteRecord = async (id: string) => {
     if (confirm('Are you sure you want to delete this weather record?')) {
       try {
@@ -662,6 +663,7 @@ export default function WeatherRecordsManager({ onClose }: WeatherRecordsManager
           )}
         </AnimatePresence>
       </motion.div>
+
     </div>
   );
 }
