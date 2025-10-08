@@ -22,6 +22,148 @@ export class WeatherService {
     }
   }
 
+  // Check if date range is in the past
+  private static isHistoricalDateRange(startDate: string, endDate: string): boolean {
+    const now = new Date();
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    
+    // If the end date is before today, it's historical
+    return end < now;
+  }
+
+  // Get historical weather data for a date range
+  private static async getHistoricalWeather(location: string, startDate: string, endDate: string): Promise<{ location: LocationData; weather: WeatherData }> {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const days = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    
+    // Limit to 10 days for historical data (API limitation)
+    const maxDays = Math.min(days, 10);
+    
+    // Get historical data for each day
+    const historicalData = [];
+    let locationData: LocationData | null = null;
+    
+    for (let i = 0; i < maxDays; i++) {
+      const currentDate = new Date(start);
+      currentDate.setDate(start.getDate() + i);
+      const dateStr = currentDate.toISOString().split('T')[0];
+      
+      try {
+        const url = `${BASE_URL}/history.json?key=${WEATHER_API_KEY}&q=${encodeURIComponent(location)}&dt=${dateStr}`;
+        const dayData = await this.makeRequest<any>(url);
+        
+        if (!locationData) {
+          locationData = {
+            name: dayData.location.name,
+            latitude: dayData.location.lat,
+            longitude: dayData.location.lon,
+            country: dayData.location.country,
+            state: dayData.location.region,
+          };
+        }
+        
+        const day = dayData.forecast.forecastday[0].day;
+        historicalData.push({
+          date: dateStr,
+          temperature: {
+            min: Math.round(day.mintemp_c || 0),
+            max: Math.round(day.maxtemp_c || 0),
+          },
+          description: day.condition?.text || 'Unknown',
+          icon: day.condition?.icon || '//cdn.weatherapi.com/weather/64x64/day/113.png',
+          current: Math.round(day.avgtemp_c || 0),
+          feelsLike: Math.round(day.avgtemp_c || 0),
+          humidity: day.avghumidity || 0,
+          pressure: day.avgpressure_mb || 1013.25,
+          windSpeed: Math.round(((day.maxwind_kph || 0) / 3.6) * 10) / 10,
+          windDirection: day.avgwind_degree || 0,
+        });
+      } catch (error) {
+        console.warn(`Failed to fetch historical data for ${dateStr}:`, error);
+        // Continue with other dates even if one fails
+      }
+    }
+    
+    if (!locationData || historicalData.length === 0) {
+      throw new Error('No historical weather data available for the specified date range');
+    }
+    
+    // For historical data, use the first day's data as "current" and show all days in forecast
+    const firstDay = historicalData[0];
+    
+    const weatherData: WeatherData = {
+      current: {
+        temperature: firstDay.current,
+        feelsLike: firstDay.feelsLike,
+        humidity: firstDay.humidity,
+        pressure: firstDay.pressure,
+        windSpeed: firstDay.windSpeed,
+        windDirection: firstDay.windDirection,
+        description: firstDay.description,
+        icon: firstDay.icon,
+      },
+      forecast: historicalData.map(day => ({
+        date: day.date,
+        temperature: {
+          min: day.temperature.min,
+          max: day.temperature.max,
+        },
+        description: day.description,
+        icon: day.icon,
+      })),
+    };
+    
+    return {
+      location: locationData,
+      weather: weatherData,
+      dailyHistoricalData: historicalData, // Include raw daily data
+    };
+  }
+
+  // New method to get weather data with date range support
+  static async getWeatherByLocationAndDateRange(
+    location: string, 
+    startDate?: string, 
+    endDate?: string
+  ): Promise<{ location: LocationData; weather: WeatherData; isHistorical: boolean }> {
+    console.log('WeatherService.getWeatherByLocationAndDateRange called with:', { location, startDate, endDate });
+    
+    if (!WEATHER_API_KEY) {
+      console.error('Weather API key is not configured');
+      throw new Error('Weather API key is not configured');
+    }
+
+    // If no date range provided, get current weather
+    if (!startDate || !endDate) {
+      const currentWeather = await this.getWeatherByLocation(location);
+      return {
+        ...currentWeather,
+        isHistorical: false
+      };
+    }
+
+    // Check if this is a historical date range
+    const isHistorical = this.isHistoricalDateRange(startDate, endDate);
+    
+    if (isHistorical) {
+      console.log('Fetching historical weather data for date range:', startDate, 'to', endDate);
+      const historicalWeather = await this.getHistoricalWeather(location, startDate, endDate);
+      return {
+        ...historicalWeather,
+        isHistorical: true
+      };
+    } else {
+      console.log('Fetching current weather data for future date range');
+      const currentWeather = await this.getWeatherByLocation(location);
+      return {
+        ...currentWeather,
+        isHistorical: false
+      };
+    }
+  }
+
   static async getWeatherByLocation(location: string): Promise<{ location: LocationData; weather: WeatherData }> {
     console.log('WeatherService.getWeatherByLocation called with:', location);
     console.log('Environment variable check:');

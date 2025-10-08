@@ -6,11 +6,13 @@ import LocationInput from '@/components/LocationInput';
 import WeatherCard from '@/components/WeatherCard';
 import WeatherDetails from '@/components/WeatherDetails';
 import ErrorDisplay from '@/components/ErrorDisplay';
+import WeatherRecordsManager from '@/components/WeatherRecordsManager';
 import { useLocation } from '@/hooks/useLocation';
-import { Cloud } from 'lucide-react';
+import { Cloud, Database } from 'lucide-react';
 
 export default function Home() {
   const { currentLocation, weatherData, isLoading, error, searchLocation, getCurrentLocation, clearError } = useLocation();
+  const [showRecordsManager, setShowRecordsManager] = useState(false);
 
   return (
     <div className="min-h-screen bg-dark">
@@ -30,6 +32,20 @@ export default function Home() {
               <h1 className="text-2xl font-semibold text-foreground">Weather App</h1>
               <p className="text-muted text-sm font-medium">by Hassan</p>
             </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="flex items-center space-x-3"
+          >
+            <button
+              onClick={() => setShowRecordsManager(true)}
+              className="flex items-center space-x-2 px-4 py-2 bg-card rounded-lg border border-subtle hover:bg-accent transition-colors"
+            >
+              <Database className="w-4 h-4 text-foreground" />
+              <span className="text-foreground font-medium">Records</span>
+            </button>
           </motion.div>
 
         </div>
@@ -133,6 +149,13 @@ export default function Home() {
 
         </div>
       </main>
+
+      {/* Weather Records Manager Modal */}
+      <AnimatePresence>
+        {showRecordsManager && (
+          <WeatherRecordsManager onClose={() => setShowRecordsManager(false)} />
+        )}
+      </AnimatePresence>
 
     </div>
   );

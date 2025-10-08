@@ -29,6 +29,22 @@ export interface IWeatherRecord extends Document {
     description: string;
     icon: string;
   }>;
+  dailyData?: Array<{
+    date: Date;
+    temperature: {
+      current: number;
+      min: number;
+      max: number;
+      feelsLike: number;
+    };
+    humidity: number;
+    pressure: number;
+    windSpeed: number;
+    windDirection: number;
+    description: string;
+    icon: string;
+  }>;
+  isHistorical: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -123,6 +139,59 @@ const WeatherRecordSchema = new Schema<IWeatherRecord>({
       required: true,
     },
   }],
+  dailyData: [{
+    date: {
+      type: Date,
+      required: true,
+    },
+    temperature: {
+      current: {
+        type: Number,
+        required: true,
+      },
+      min: {
+        type: Number,
+        required: true,
+      },
+      max: {
+        type: Number,
+        required: true,
+      },
+      feelsLike: {
+        type: Number,
+        required: true,
+      },
+    },
+    humidity: {
+      type: Number,
+      required: true,
+    },
+    pressure: {
+      type: Number,
+      required: true,
+    },
+    windSpeed: {
+      type: Number,
+      required: true,
+    },
+    windDirection: {
+      type: Number,
+      required: true,
+    },
+    description: {
+      type: String,
+      required: true,
+    },
+    icon: {
+      type: String,
+      required: true,
+    },
+  }],
+  isHistorical: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
 }, {
   timestamps: true,
 });

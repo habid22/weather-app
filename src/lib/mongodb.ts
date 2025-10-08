@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const MONGODB_URI = process.env.NEXT_PUBLIC_MONGODB_URI;
+const MONGODB_URI = process.env.NEXT_PUBLIC_MONGODB_URI || 'mongodb+srv://hassanaminsheikh_db_user:7xkcE8i4uMKecY9N@weather-cluster.ayjre4x.mongodb.net/?retryWrites=true&w=majority&appName=weather-cluster';
 
 if (!MONGODB_URI) {
   throw new Error('Please define the NEXT_PUBLIC_MONGODB_URI environment variable inside .env.local');
