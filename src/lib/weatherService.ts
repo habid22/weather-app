@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { WeatherApiResponse, WeatherData, LocationData } from '@/types/weather';
 
-const WEATHER_API_KEY = process.env.NEXT_PUBLIC_WEATHER_API_KEY || '37001647cefc4a8cb2c172227250710';
+const WEATHER_API_KEY = process.env.NEXT_PUBLIC_WEATHER_API_KEY;
 const BASE_URL = 'https://api.weatherapi.com/v1';
 
 export class WeatherService {
@@ -133,7 +133,7 @@ export class WeatherService {
       location: locationData,
       weather: weatherData,
       dailyHistoricalData: historicalData, // Include raw daily data
-    };
+    } as any;
   }
 
   // New method to get weather data with date range support
@@ -167,7 +167,7 @@ export class WeatherService {
       return {
         ...historicalWeather,
         isHistorical: true,
-        dailyData: historicalWeather.dailyHistoricalData
+        dailyData: (historicalWeather as any).dailyHistoricalData
       };
     } else {
       console.log('Fetching current weather data for future date range');

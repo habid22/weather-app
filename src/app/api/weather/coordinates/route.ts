@@ -13,7 +13,15 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const coordinates = await WeatherService.getCoordinates(location);
+    const weatherData = await WeatherService.getWeatherByLocation(location);
+    const coordinates = {
+      location: weatherData.location.name,
+      latitude: weatherData.location.latitude,
+      longitude: weatherData.location.longitude,
+      country: weatherData.location.country,
+      state: weatherData.location.state,
+      timezone: weatherData.location.timezone
+    };
     return NextResponse.json(coordinates);
   } catch (error: any) {
     console.error('Coordinates API error:', error);

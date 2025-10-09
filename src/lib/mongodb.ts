@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const MONGODB_URI = process.env.NEXT_PUBLIC_MONGODB_URI || 'mongodb+srv://hassanaminsheikh_db_user:7xkcE8i4uMKecY9N@weather-cluster.ayjre4x.mongodb.net/?retryWrites=true&w=majority&appName=weather-cluster';
+const MONGODB_URI = process.env.NEXT_PUBLIC_MONGODB_URI;
 
 if (!MONGODB_URI) {
   throw new Error('Please define the NEXT_PUBLIC_MONGODB_URI environment variable inside .env.local');
@@ -22,6 +22,11 @@ if (!cached) {
 }
 
 async function connectDB() {
+  // Only connect on server side
+  if (typeof window !== 'undefined') {
+    throw new Error('MongoDB connection should only be called on server side');
+  }
+
   if (cached.conn) {
     return cached.conn;
   }

@@ -1,4 +1,4 @@
-const YOUTUBE_API_KEY = 'AIzaSyAQksFhN6IeHClle-4Y4lhQTBrv0A0dptQ';
+const YOUTUBE_API_KEY = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY;
 
 export interface YouTubeVideo {
   id: string;

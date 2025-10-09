@@ -25,7 +25,11 @@ export default function Mapbox3DMap({ location, latitude, longitude }: Mapbox3DM
         const mapboxgl = (await import('mapbox-gl')).default;
         
         // Set the access token
-        mapboxgl.accessToken = 'pk.eyJ1Ijoiam9obmRvZTEzNTM1IiwiYSI6ImNtZ2loaDE1dDA5eGIyam9qdjE1eTg0anoifQ.76SPaHSDM6LyCpC9bm2L8w';
+        const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
+        if (!accessToken) {
+          throw new Error('Mapbox access token is not configured');
+        }
+        mapboxgl.accessToken = accessToken;
 
         // Create the map with your custom style
         map.current = new mapboxgl.Map({

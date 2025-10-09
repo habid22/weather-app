@@ -36,11 +36,11 @@
 
 ## ⚙️ Setup
 
-Add to your `.env.local`:
+Add to your `.env`:
 
 ```env
 # Mapbox (optional - defaults to OpenStreetMap)
-MAPBOX_ACCESS_TOKEN=your_mapbox_token_here
+NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=your_mapbox_token_here
 
 # Here Maps (optional)
 HERE_API_KEY=your_here_api_key_here

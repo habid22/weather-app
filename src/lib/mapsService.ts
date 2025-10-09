@@ -9,18 +9,27 @@ export interface LocationInfo {
 export class MapsService {
   // Mapbox 3D implementation
   static generateMapboxUrl(latitude: number, longitude: number, zoom: number = 12): string {
-    const accessToken = 'pk.eyJ1Ijoiam9obmRvZTEzNTM1IiwiYSI6ImNtZ2loaDE1dDA5eGIyam9qdjE1eTg0anoifQ.76SPaHSDM6LyCpC9bm2L8w';
+    const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
+    if (!accessToken) {
+      throw new Error('Mapbox access token is not configured');
+    }
     return `https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/pin-s-marker+ff0000(${longitude},${latitude})/${longitude},${latitude},${zoom},0/600x400@2x?access_token=${accessToken}`;
   }
 
   static generateMapboxEmbedUrl(latitude: number, longitude: number, zoom: number = 12): string {
-    const accessToken = 'pk.eyJ1Ijoiam9obmRvZTEzNTM1IiwiYSI6ImNtZ2loaDE1dDA5eGIyam9qdjE1eTg0anoifQ.76SPaHSDM6LyCpC9bm2L8w';
+    const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
+    if (!accessToken) {
+      throw new Error('Mapbox access token is not configured');
+    }
     return `https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/pin-s-marker+ff0000(${longitude},${latitude})/${longitude},${latitude},${zoom},0/600x400@2x?access_token=${accessToken}`;
   }
 
   // Mapbox 3D GL JS configuration with your custom style
   static getMapboxConfig(latitude: number, longitude: number, zoom: number = 15.5) {
-    const accessToken = 'pk.eyJ1Ijoiam9obmRvZTEzNTM1IiwiYSI6ImNtZ2loaDE1dDA5eGIyam9qdjE1eTg0anoifQ.76SPaHSDM6LyCpC9bm2L8w';
+    const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
+    if (!accessToken) {
+      throw new Error('Mapbox access token is not configured');
+    }
     
     return {
       accessToken,

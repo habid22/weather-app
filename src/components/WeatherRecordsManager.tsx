@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Plus, 
-  Search, 
   Filter, 
   Edit, 
   Trash2, 
@@ -21,6 +20,7 @@ import {
 import { useWeatherRecords } from '@/hooks/useWeatherRecords';
 import { WeatherRecord } from '@/hooks/useWeatherRecords';
 import HistoricalWeatherDetails from './HistoricalWeatherDetails';
+import ExportButton from './ExportButton';
 
 interface WeatherRecordsManagerProps {
   onClose?: () => void;
@@ -72,7 +72,7 @@ export default function WeatherRecordsManager({ onClose }: WeatherRecordsManager
     }
   };
 
-  const handleUpdateRecord = async (id: string, data: any) => {
+  const handleUpdateRecord = async (id: string, data: Record<string, unknown>) => {
     try {
       await updateRecord(id, data);
       setEditingRecord(null);
@@ -159,6 +159,7 @@ export default function WeatherRecordsManager({ onClose }: WeatherRecordsManager
             <p className="text-muted">Manage your saved weather data</p>
           </div>
           <div className="flex items-center space-x-2">
+            <ExportButton records={records} disabled={loading} />
             <button
               onClick={() => setShowFilters(!showFilters)}
               className="p-2 rounded-lg bg-background border border-subtle hover:bg-accent hover:border-primary/50 hover:scale-105 transition-all duration-200 group"

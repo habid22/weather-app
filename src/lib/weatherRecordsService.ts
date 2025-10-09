@@ -1,4 +1,4 @@
-import { WeatherRecord } from '@/models/WeatherRecord';
+// import { WeatherRecord } from '@/models/WeatherRecord';
 
 export interface WeatherRecordData {
   location: string;
