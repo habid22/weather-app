@@ -16,16 +16,24 @@ import { ExportService, ExportableRecord } from '@/lib/exportService';
 
 interface ExportButtonProps {
   records: ExportableRecord[];
+  selectedRecords?: ExportableRecord[];
   disabled?: boolean;
+  onSelectionChange?: (selectedRecords: ExportableRecord[]) => void;
 }
 
-export default function ExportButton({ records, disabled = false }: ExportButtonProps) {
+export default function ExportButton({ 
+  records, 
+  selectedRecords = records, 
+  disabled = false, 
+  onSelectionChange 
+}: ExportButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [exportedFormats, setExportedFormats] = useState<string[]>([]);
+  const [localSelectedRecords, setLocalSelectedRecords] = useState<ExportableRecord[]>(selectedRecords);
 
   const handleExport = async (format: string) => {
-    if (records.length === 0) return;
+    if (localSelectedRecords.length === 0) return;
     
     setIsExporting(true);
     setExportedFormats([]);
@@ -33,19 +41,19 @@ export default function ExportButton({ records, disabled = false }: ExportButton
     try {
       switch (format) {
         case 'json':
-          ExportService.exportToJSON(records);
+          ExportService.exportToJSON(localSelectedRecords);
           break;
         case 'csv':
-          ExportService.exportToCSV(records);
+          ExportService.exportToCSV(localSelectedRecords);
           break;
         case 'xml':
-          ExportService.exportToXML(records);
+          ExportService.exportToXML(localSelectedRecords);
           break;
         case 'pdf':
-          await ExportService.exportToPDF(records);
+          await ExportService.exportToPDF(localSelectedRecords);
           break;
         case 'all':
-          await ExportService.exportAllFormats(records);
+          await ExportService.exportAllFormats(localSelectedRecords);
           setExportedFormats(['json', 'csv', 'xml', 'pdf']);
           break;
       }
@@ -113,9 +121,9 @@ export default function ExportButton({ records, disabled = false }: ExportButton
       >
         <Download className="w-4 h-4 group-hover:animate-bounce" />
         <span className="font-medium">Export</span>
-        {records.length > 0 && (
+        {localSelectedRecords.length > 0 && (
           <span className="bg-primary-foreground/20 px-2 py-1 rounded-full text-xs">
-            {records.length}
+            {localSelectedRecords.length}
           </span>
         )}
       </button>
@@ -134,25 +142,97 @@ export default function ExportButton({ records, disabled = false }: ExportButton
               initial={{ opacity: 0, scale: 0.95, y: -10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: -10 }}
-              className="absolute right-0 top-full mt-2 w-64 bg-card rounded-xl shadow-2xl border border-subtle z-50 overflow-hidden"
+              className="fixed inset-0 bg-background/95 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+              style={{ 
+                maxWidth: 'none',
+                top: '0',
+                left: '0',
+                right: '0',
+                bottom: '0',
+                transform: 'none'
+              }}
             >
-              <div className="p-4 border-b border-subtle">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-semibold text-foreground">Export Data</h3>
-                  <button
-                    onClick={() => setIsOpen(false)}
-                    className="p-1 rounded hover:bg-accent transition-colors"
-                  >
-                    <X className="w-4 h-4 text-muted" />
-                  </button>
+              <div className="w-full max-w-2xl max-h-[90vh] bg-card rounded-xl shadow-2xl border border-subtle overflow-hidden flex flex-col">
+                <div className="p-4 border-b border-subtle flex-shrink-0">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold text-foreground">Export Data</h3>
+                    <button
+                      onClick={() => setIsOpen(false)}
+                      className="p-1 rounded hover:bg-accent transition-colors"
+                    >
+                      <X className="w-4 h-4 text-muted" />
+                    </button>
+                  </div>
+                  <p className="text-sm text-muted mt-1">
+                    Export {localSelectedRecords.length} of {records.length} weather record{records.length !== 1 ? 's' : ''}
+                  </p>
                 </div>
-                <p className="text-sm text-muted mt-1">
-                  Export {records.length} weather record{records.length !== 1 ? 's' : ''}
-                </p>
-              </div>
 
-              <div className="p-2">
-                {exportOptions.map((option) => {
+                {/* Selection Controls */}
+                <div className="p-4 border-b border-subtle flex-shrink-0">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-sm font-medium text-foreground">Select Records</span>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => {
+                          setLocalSelectedRecords(records);
+                          onSelectionChange?.(records);
+                        }}
+                        className="text-xs px-3 py-1 bg-primary text-primary-foreground rounded hover:bg-primary/90 transition-colors"
+                      >
+                        Select All
+                      </button>
+                      <button
+                        onClick={() => {
+                          setLocalSelectedRecords([]);
+                          onSelectionChange?.([]);
+                        }}
+                        className="text-xs px-3 py-1 bg-accent rounded hover:bg-accent/80 transition-colors"
+                      >
+                        Clear All
+                      </button>
+                    </div>
+                  </div>
+                  <div className="max-h-48 overflow-y-auto space-y-2">
+                    {records.map((record) => {
+                      const isSelected = localSelectedRecords.some(selected => selected._id === record._id);
+                      return (
+                        <label key={record._id} className="flex items-center space-x-3 p-3 rounded-lg hover:bg-accent cursor-pointer border border-subtle">
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                const newSelected = [...localSelectedRecords, record];
+                                setLocalSelectedRecords(newSelected);
+                                onSelectionChange?.(newSelected);
+                              } else {
+                                const newSelected = localSelectedRecords.filter(selected => selected._id !== record._id);
+                                setLocalSelectedRecords(newSelected);
+                                onSelectionChange?.(newSelected);
+                              }
+                            }}
+                            className="w-4 h-4 text-primary bg-background border-subtle rounded focus:ring-primary focus:ring-2"
+                          />
+                          <div className="flex-1">
+                            <span className="text-sm font-medium text-foreground">
+                              {record.location}
+                            </span>
+                            <div className="text-xs text-muted">
+                              {record.isHistorical ? 'Historical' : 'Current'} • {record.dateRange.start.split('T')[0]} to {record.dateRange.end.split('T')[0]}
+                            </div>
+                          </div>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Export Options */}
+                <div className="p-4 flex-1 overflow-y-auto">
+                  <h4 className="text-sm font-medium text-foreground mb-3">Export Formats</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {exportOptions.map((option) => {
                   const Icon = option.icon;
                   const isExported = exportedFormats.includes(option.id);
                   const isExportingFormat = isExporting && !isExported;
@@ -184,14 +264,16 @@ export default function ExportButton({ records, disabled = false }: ExportButton
                       )}
                     </button>
                   );
-                })}
+                    })}
+                  </div>
+                </div>
               </div>
 
-              {records.length === 0 && (
-                <div className="p-4 text-center text-muted text-sm">
-                  No records to export
-                </div>
-              )}
+                {records.length === 0 && (
+                  <div className="p-8 text-center text-muted text-sm">
+                    No records to export
+                  </div>
+                )}
             </motion.div>
           </>
         )}

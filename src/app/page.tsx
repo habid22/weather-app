@@ -11,7 +11,7 @@ import Mapbox3DMap from '@/components/Mapbox3DMap';
 import HourlyForecast from '@/components/HourlyForecast';
 import { useLocation } from '@/hooks/useLocation';
 import { getWeatherIcon } from '@/lib/weatherUtils';
-import { Cloud, Database } from 'lucide-react';
+import { Cloud, Database, Info } from 'lucide-react';
 
 export default function Home() {
   const { currentLocation, weatherData, isLoading, error, searchLocation, getCurrentLocation, clearError } = useLocation();
@@ -31,10 +31,10 @@ export default function Home() {
             <div className="p-2 bg-card rounded-lg border border-subtle">
               <Cloud className="w-8 h-8 text-foreground" />
             </div>
-            <div>
-              <h1 className="text-2xl font-semibold text-foreground">Weather App</h1>
-              <p className="text-muted text-sm font-medium">by Hassan Amin</p>
-            </div>
+                    <div>
+                      <h1 className="text-2xl font-semibold text-foreground">A Simple Weather App.</h1>
+                      <p className="text-muted text-sm font-medium">by Hassan Amin</p>
+                    </div>
           </motion.div>
 
           <motion.div
@@ -179,6 +179,20 @@ export default function Home() {
           <WeatherRecordsManager onClose={() => setShowRecordsManager(false)} />
         )}
       </AnimatePresence>
+
+      {/* PM Accelerator Info Button */}
+      <footer className="fixed bottom-4 right-4 z-10">
+        <button
+          onClick={() => window.open('https://www.linkedin.com/school/pmaccelerator/posts/?feedView=all', '_blank')}
+          className="flex items-center space-x-2 px-3 py-2 bg-card/80 backdrop-blur-sm rounded-lg border border-subtle hover:bg-accent/80 hover:border-primary/50 transition-all duration-200 group"
+          title="Learn about PM Accelerator"
+        >
+          <Info className="w-4 h-4 text-muted group-hover:text-primary transition-colors" />
+          <span className="text-xs text-muted group-hover:text-primary transition-colors font-medium">
+            PM Accelerator
+          </span>
+        </button>
+      </footer>
 
     </div>
   );

@@ -70,7 +70,11 @@ export class ExportService {
   static exportToCSV(records: ExportableRecord[], filename?: string): void {
     if (records.length === 0) return;
 
-    const headers = [
+    // Create comprehensive CSV with all data
+    let csvContent = '';
+    
+    // Main records data
+    const mainHeaders = [
       'ID',
       'Location',
       'Latitude',
@@ -86,14 +90,16 @@ export class ExportService {
       'Wind Speed (m/s)',
       'Wind Direction (°)',
       'Description',
+      'Icon',
       'Is Historical',
       'Created At',
       'Updated At'
     ];
 
-    const csvContent = [
-      headers.join(','),
-      ...records.map(record => [
+    csvContent += mainHeaders.join(',') + '\n';
+    
+    records.forEach(record => {
+      const mainRow = [
         record._id,
         `"${record.location}"`,
         record.latitude,
@@ -109,11 +115,92 @@ export class ExportService {
         record.temperatureData.windSpeed,
         record.temperatureData.windDirection,
         `"${record.temperatureData.description}"`,
+        `"${record.temperatureData.icon}"`,
         record.isHistorical,
         record.createdAt.split('T')[0],
         record.updatedAt.split('T')[0]
-      ].join(','))
-    ].join('\n');
+      ].join(',');
+      
+      csvContent += mainRow + '\n';
+    });
+
+    // Add forecast data if available
+    const hasForecast = records.some(record => record.forecast && record.forecast.length > 0);
+    if (hasForecast) {
+      csvContent += '\n\n--- FORECAST DATA ---\n';
+      const forecastHeaders = [
+        'Record ID',
+        'Location',
+        'Date',
+        'Min Temperature (°C)',
+        'Max Temperature (°C)',
+        'Description',
+        'Icon'
+      ];
+      csvContent += forecastHeaders.join(',') + '\n';
+      
+      records.forEach(record => {
+        if (record.forecast) {
+          record.forecast.forEach(forecast => {
+            const forecastRow = [
+              record._id,
+              `"${record.location}"`,
+              new Date(forecast.date).toISOString().split('T')[0],
+              forecast.temperature.min,
+              forecast.temperature.max,
+              `"${forecast.description}"`,
+              `"${forecast.icon}"`
+            ].join(',');
+            csvContent += forecastRow + '\n';
+          });
+        }
+      });
+    }
+
+    // Add daily historical data if available
+    const hasDailyData = records.some(record => record.dailyData && record.dailyData.length > 0);
+    if (hasDailyData) {
+      csvContent += '\n\n--- DAILY HISTORICAL DATA ---\n';
+      const dailyHeaders = [
+        'Record ID',
+        'Location',
+        'Date',
+        'Current Temperature (°C)',
+        'Min Temperature (°C)',
+        'Max Temperature (°C)',
+        'Feels Like (°C)',
+        'Humidity (%)',
+        'Pressure (mb)',
+        'Wind Speed (m/s)',
+        'Wind Direction (°)',
+        'Description',
+        'Icon'
+      ];
+      csvContent += dailyHeaders.join(',') + '\n';
+      
+      records.forEach(record => {
+        if (record.dailyData) {
+          record.dailyData.forEach(daily => {
+            const dailyRow = [
+              record._id,
+              `"${record.location}"`,
+              new Date(daily.date).toISOString().split('T')[0],
+              daily.temperature.current,
+              daily.temperature.min,
+              daily.temperature.max,
+              daily.temperature.feelsLike,
+              daily.humidity,
+              daily.pressure,
+              daily.windSpeed,
+              daily.windDirection,
+              `"${daily.description}"`,
+              `"${daily.icon}"`
+            ].join(',');
+            csvContent += dailyRow + '\n';
+          });
+        }
+      });
+    }
 
     const dataBlob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(dataBlob);
@@ -230,17 +317,61 @@ export class ExportService {
 
     records.forEach((record, index) => {
       content += `RECORD ${index + 1}: ${record.location}\n`;
-      content += '-'.repeat(30) + '\n';
+      content += '='.repeat(50) + '\n';
+      content += `Location: ${record.location}\n`;
+      content += `Coordinates: ${record.latitude}, ${record.longitude}\n`;
       content += `Date Range: ${record.dateRange.start.split('T')[0]} to ${record.dateRange.end.split('T')[0]}\n`;
+      content += `Type: ${record.isHistorical ? 'Historical' : 'Current'}\n\n`;
+      
+      content += 'CURRENT WEATHER DATA:\n';
+      content += '-'.repeat(25) + '\n';
       content += `Temperature: ${record.temperatureData.current}°C (feels like ${record.temperatureData.feelsLike}°C)\n`;
       content += `Range: ${record.temperatureData.min}°C - ${record.temperatureData.max}°C\n`;
       content += `Humidity: ${record.temperatureData.humidity}%\n`;
       content += `Pressure: ${record.temperatureData.pressure} mb\n`;
       content += `Wind: ${record.temperatureData.windSpeed} m/s at ${record.temperatureData.windDirection}°\n`;
       content += `Description: ${record.temperatureData.description}\n`;
-      content += `Type: ${record.isHistorical ? 'Historical' : 'Current'}\n`;
+      content += `Icon: ${record.temperatureData.icon}\n\n`;
+
+      // Add forecast data if available
+      if (record.forecast && record.forecast.length > 0) {
+        content += '5-DAY FORECAST:\n';
+        content += '-'.repeat(20) + '\n';
+        record.forecast.forEach((forecast, dayIndex) => {
+          const date = new Date(forecast.date).toLocaleDateString();
+          content += `Day ${dayIndex + 1} (${date}):\n`;
+          content += `  Temperature: ${forecast.temperature.min}°C - ${forecast.temperature.max}°C\n`;
+          content += `  Description: ${forecast.description}\n`;
+          content += `  Icon: ${forecast.icon}\n`;
+        });
+        content += '\n';
+      }
+
+      // Add daily historical data if available
+      if (record.dailyData && record.dailyData.length > 0) {
+        content += 'DAILY HISTORICAL DATA:\n';
+        content += '-'.repeat(25) + '\n';
+        record.dailyData.forEach((daily, dayIndex) => {
+          const date = new Date(daily.date).toLocaleDateString();
+          content += `Day ${dayIndex + 1} (${date}):\n`;
+          content += `  Current: ${daily.temperature.current}°C\n`;
+          content += `  Range: ${daily.temperature.min}°C - ${daily.temperature.max}°C\n`;
+          content += `  Feels Like: ${daily.temperature.feelsLike}°C\n`;
+          content += `  Humidity: ${daily.humidity}%\n`;
+          content += `  Pressure: ${daily.pressure} mb\n`;
+          content += `  Wind: ${daily.windSpeed} m/s at ${daily.windDirection}°\n`;
+          content += `  Description: ${daily.description}\n`;
+          content += `  Icon: ${daily.icon}\n`;
+        });
+        content += '\n';
+      }
+
+      content += 'METADATA:\n';
+      content += '-'.repeat(10) + '\n';
       content += `Created: ${record.createdAt.split('T')[0]}\n`;
-      content += `Updated: ${record.updatedAt.split('T')[0]}\n\n`;
+      content += `Updated: ${record.updatedAt.split('T')[0]}\n`;
+      content += `Record ID: ${record._id}\n\n`;
+      content += '='.repeat(50) + '\n\n';
     });
 
     return content;

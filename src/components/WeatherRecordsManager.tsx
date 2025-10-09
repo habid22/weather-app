@@ -45,6 +45,7 @@ export default function WeatherRecordsManager({ onClose }: WeatherRecordsManager
   const [editingRecord, setEditingRecord] = useState<WeatherRecord | null>(null);
   const [selectedRecord, setSelectedRecord] = useState<WeatherRecord | null>(null);
   const [deleteConfirmRecord, setDeleteConfirmRecord] = useState<WeatherRecord | null>(null);
+  const [selectedRecords, setSelectedRecords] = useState<WeatherRecord[]>([]);
   const [formData, setFormData] = useState({
     location: '',
     startDate: '',
@@ -156,10 +157,15 @@ export default function WeatherRecordsManager({ onClose }: WeatherRecordsManager
         <div className="flex items-center justify-between p-6 border-b border-subtle">
           <div>
             <h2 className="text-2xl font-bold text-foreground">Weather Records</h2>
-            <p className="text-muted">Manage your saved weather data</p>
+            <p className="text-muted">Manage your saved weather data from A Simple Weather App</p>
           </div>
           <div className="flex items-center space-x-2">
-            <ExportButton records={records} disabled={loading} />
+            <ExportButton 
+              records={records} 
+              selectedRecords={selectedRecords}
+              disabled={loading}
+              onSelectionChange={setSelectedRecords}
+            />
             <button
               onClick={() => setShowFilters(!showFilters)}
               className="p-2 rounded-lg bg-background border border-subtle hover:bg-accent hover:border-primary/50 hover:scale-105 transition-all duration-200 group"
