@@ -112,7 +112,6 @@ export default function WeatherRecordsManager({ onClose }: WeatherRecordsManager
     }
   };
 
-
   const handleDeleteRecord = (record: WeatherRecord) => {
     setDeleteConfirmRecord(record);
   };
@@ -156,7 +155,7 @@ export default function WeatherRecordsManager({ onClose }: WeatherRecordsManager
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-subtle">
           <div>
-            <h2 className="text-2xl font-bold text-foreground">Weather Records</h2>
+            <h2 className="text-2xl font-bold text-foreground">Weather History</h2>
             <p className="text-muted">Manage your saved weather data from A Simple Weather App</p>
           </div>
           <div className="flex items-center space-x-2">
@@ -252,7 +251,7 @@ export default function WeatherRecordsManager({ onClose }: WeatherRecordsManager
             </div>
           ) : records.length === 0 ? (
             <div className="text-center py-8">
-              <div className="text-muted mb-4">No weather records found</div>
+              <div className="text-muted mb-4">No weather history found</div>
               <button
                 onClick={() => setShowCreateForm(true)}
                 className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 hover:scale-105 transition-all duration-200 group"
@@ -353,7 +352,7 @@ export default function WeatherRecordsManager({ onClose }: WeatherRecordsManager
         {pagination.pages > 1 && (
           <div className="flex items-center justify-between p-6 border-t border-subtle">
             <div className="text-sm text-muted">
-              Showing {records.length} of {pagination.total} records
+              Showing {records.length} of {pagination.total} weather history entries
             </div>
             <div className="flex items-center space-x-2">
               <button
@@ -546,7 +545,6 @@ export default function WeatherRecordsManager({ onClose }: WeatherRecordsManager
                     </div>
                   )}
 
-                  
                   <div className="flex items-center justify-end space-x-3">
                     <button
                       type="button"

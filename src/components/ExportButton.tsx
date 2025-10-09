@@ -164,14 +164,14 @@ export default function ExportButton({
                     </button>
                   </div>
                   <p className="text-sm text-muted mt-1">
-                    Export {localSelectedRecords.length} of {records.length} weather record{records.length !== 1 ? 's' : ''}
+                    Export {localSelectedRecords.length} of {records.length} weather history entr{records.length !== 1 ? 'ies' : 'y'}
                   </p>
                 </div>
 
                 {/* Selection Controls */}
                 <div className="p-4 border-b border-subtle flex-shrink-0">
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-sm font-medium text-foreground">Select Records</span>
+                    <span className="text-sm font-medium text-foreground">Select History Entries</span>
                     <div className="flex space-x-2">
                       <button
                         onClick={() => {
@@ -271,7 +271,7 @@ export default function ExportButton({
 
                 {records.length === 0 && (
                   <div className="p-8 text-center text-muted text-sm">
-                    No records to export
+                    No weather history to export
                   </div>
                 )}
             </motion.div>

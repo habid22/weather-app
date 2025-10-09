@@ -59,7 +59,7 @@ export class ExportService {
     
     const link = document.createElement('a');
     link.href = url;
-    link.download = filename || `weather-records-${new Date().toISOString().split('T')[0]}.json`;
+    link.download = filename || `weather-history-${new Date().toISOString().split('T')[0]}.json`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -207,7 +207,7 @@ export class ExportService {
     
     const link = document.createElement('a');
     link.href = url;
-    link.download = filename || `weather-records-${new Date().toISOString().split('T')[0]}.csv`;
+    link.download = filename || `weather-history-${new Date().toISOString().split('T')[0]}.csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -283,7 +283,7 @@ export class ExportService {
     
     const link = document.createElement('a');
     link.href = url;
-    link.download = filename || `weather-records-${new Date().toISOString().split('T')[0]}.xml`;
+    link.download = filename || `weather-history-${new Date().toISOString().split('T')[0]}.xml`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -301,7 +301,7 @@ export class ExportService {
     
     const link = document.createElement('a');
     link.href = url;
-    link.download = filename || `weather-records-${new Date().toISOString().split('T')[0]}.txt`;
+    link.download = filename || `weather-history-${new Date().toISOString().split('T')[0]}.txt`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -310,7 +310,7 @@ export class ExportService {
 
   // Generate PDF-like content as text
   private static generatePDFContent(records: ExportableRecord[]): string {
-    let content = 'WEATHER RECORDS EXPORT\n';
+    let content = 'WEATHER HISTORY EXPORT\n';
     content += '='.repeat(50) + '\n\n';
     content += `Export Date: ${new Date().toLocaleDateString()}\n`;
     content += `Total Records: ${records.length}\n\n`;
@@ -389,7 +389,7 @@ export class ExportService {
 
   // Export all formats at once
   static async exportAllFormats(records: ExportableRecord[]): Promise<void> {
-    const baseFilename = `weather-records-${new Date().toISOString().split('T')[0]}`;
+    const baseFilename = `weather-history-${new Date().toISOString().split('T')[0]}`;
     
     // Export JSON
     this.exportToJSON(records, `${baseFilename}.json`);

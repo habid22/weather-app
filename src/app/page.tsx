@@ -47,7 +47,7 @@ export default function Home() {
               className="flex items-center space-x-2 px-4 py-2 bg-card rounded-lg border border-subtle hover:bg-accent hover:border-primary/50 hover:scale-105 transition-all duration-200 group"
             >
               <Database className="w-4 h-4 text-foreground group-hover:text-primary transition-colors" />
-              <span className="text-foreground font-medium group-hover:text-primary transition-colors">Records</span>
+              <span className="text-foreground font-medium group-hover:text-primary transition-colors">Weather History</span>
             </button>
           </motion.div>
 
@@ -173,7 +173,7 @@ export default function Home() {
         </div>
       </main>
 
-      {/* Weather Records Manager Modal */}
+      {/* Weather History Manager Modal */}
       <AnimatePresence>
         {showRecordsManager && (
           <WeatherRecordsManager onClose={() => setShowRecordsManager(false)} />

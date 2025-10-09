@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
 
     // Set appropriate headers based on format
     const timestamp = new Date().toISOString().split('T')[0];
-    let filename = `weather-records-${timestamp}`;
+    let filename = `weather-history-${timestamp}`;
     let contentType = 'application/json';
     let data: string;
 
