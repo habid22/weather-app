@@ -152,7 +152,7 @@ export function useWeatherRecords(initialFilters: WeatherRecordFilters = {}) {
   // Fetch records when filters change
   useEffect(() => {
     fetchRecords();
-  }, [fetchRecords]);
+  }, [filters]); // Use filters directly instead of fetchRecords to avoid circular dependency
 
   return {
     records,
