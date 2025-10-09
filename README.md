@@ -50,17 +50,21 @@ A comprehensive weather application built with Next.js, TypeScript, and MongoDB 
 3. **Set up environment variables**
    Create a `.env.local` file in the root directory:
    ```env
-   # Database
+   # Database (REQUIRED - use MONGODB_URI, NOT NEXT_PUBLIC_MONGODB_URI)
    MONGODB_URI=your_mongodb_connection_string
    
-   # Weather API
-   WEATHER_API_KEY=your_weatherapi_key
+   # Weather API (REQUIRED)
+   NEXT_PUBLIC_WEATHER_API_KEY=your_weatherapi_key
+   OPENWEATHER_API_KEY=your_openweather_api_key
    
    # Mapbox (for 3D maps)
    NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=your_mapbox_token
    
    # YouTube API (optional)
-   YOUTUBE_API_KEY=your_youtube_api_key
+   NEXT_PUBLIC_YOUTUBE_API_KEY=your_youtube_api_key
+   
+   # HERE Maps (optional)
+   HERE_API_KEY=your_here_api_key
    ```
 
 4. **Run the development server**
@@ -95,9 +99,9 @@ A comprehensive weather application built with Next.js, TypeScript, and MongoDB 
 
 3. **Check 5-day forecast** for extended planning
 
-### Managing Weather History
+### Managing Weather Data
 1. **Save weather data** by clicking the save button
-2. **Access Weather History** via the database button
+2. **Access My Weather Data** via the database button in the header
 3. **Export data** in your preferred format (JSON, CSV, XML, PDF)
 4. **Update or delete** saved entries as needed
 
@@ -153,10 +157,24 @@ interface WeatherRecord {
 ## 🚀 Deployment
 
 ### Vercel (Recommended)
-1. Push your code to GitHub
-2. Connect your repository to Vercel
-3. Add environment variables in Vercel dashboard
-4. Deploy automatically
+
+**IMPORTANT**: Follow these steps carefully to avoid deployment issues:
+
+1. **Push your code to GitHub**
+2. **Connect your repository to Vercel**
+3. **Set up environment variables in Vercel dashboard**:
+   - Go to your Vercel project → Settings → Environment Variables
+   - Add all environment variables from your `.env.local` file
+   - **CRITICAL**: Use `MONGODB_URI` (NOT `NEXT_PUBLIC_MONGODB_URI`) for your database connection
+   - MongoDB connection strings should be **private** environment variables
+4. **Deploy automatically**
+
+### Common Vercel Deployment Issues
+
+- **"Failed to fetch weather records"**: Usually caused by incorrect MongoDB environment variable setup
+- **API errors**: Ensure all API keys are properly set in Vercel environment variables  
+- **Database connection issues**: Verify MongoDB Atlas IP whitelist includes Vercel's IP ranges
+- **Build failures**: Check that all environment variables are set correctly
 
 ### Other Platforms
 - **Netlify**: Compatible with Next.js
