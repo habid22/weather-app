@@ -6,7 +6,15 @@ import { WeatherService } from '@/lib/weatherService';
 // GET - Read all weather records with optional filtering
 export async function GET(request: NextRequest) {
   try {
+    console.log('Weather records GET endpoint called');
+    console.log('Environment check:', {
+      NODE_ENV: process.env.NODE_ENV,
+      MONGODB_URI_EXISTS: !!process.env.MONGODB_URI,
+      MONGODB_URI_PREFIX: process.env.MONGODB_URI ? process.env.MONGODB_URI.substring(0, 20) + '...' : 'undefined'
+    });
+    
     await connectDB();
+    console.log('MongoDB connection successful');
     
     const { searchParams } = new URL(request.url);
     const location = searchParams.get('location');
@@ -63,8 +71,17 @@ export async function GET(request: NextRequest) {
 
   } catch (error: any) {
     console.error('Error fetching weather records:', error);
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
     return NextResponse.json(
-      { success: false, error: 'Failed to fetch weather records' },
+      { 
+        success: false, 
+        error: 'Failed to fetch weather records',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      },
       { status: 500 }
     );
   }

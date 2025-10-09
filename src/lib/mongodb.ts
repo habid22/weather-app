@@ -27,7 +27,12 @@ async function connectDB() {
     throw new Error('MongoDB connection should only be called on server side');
   }
 
+  console.log('Attempting to connect to MongoDB...');
+  console.log('MONGODB_URI exists:', !!MONGODB_URI);
+  console.log('MONGODB_URI prefix:', MONGODB_URI ? MONGODB_URI.substring(0, 20) + '...' : 'undefined');
+
   if (cached.conn) {
+    console.log('Using cached MongoDB connection');
     return cached.conn;
   }
 
@@ -43,7 +48,9 @@ async function connectDB() {
 
   try {
     cached.conn = await cached.promise;
+    console.log('MongoDB connection established successfully');
   } catch (e) {
+    console.error('MongoDB connection failed:', e);
     cached.promise = null;
     throw e;
   }
