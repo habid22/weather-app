@@ -10,6 +10,7 @@ import WeatherRecordsManager from '@/components/WeatherRecordsManager';
 import Mapbox3DMap from '@/components/Mapbox3DMap';
 import HourlyForecast from '@/components/HourlyForecast';
 import { useLocation } from '@/hooks/useLocation';
+import { getWeatherIcon } from '@/lib/weatherUtils';
 import { Cloud, Database } from 'lucide-react';
 
 export default function Home() {
@@ -32,7 +33,7 @@ export default function Home() {
             </div>
             <div>
               <h1 className="text-2xl font-semibold text-foreground">Weather App</h1>
-              <p className="text-muted text-sm font-medium">by Hassan</p>
+              <p className="text-muted text-sm font-medium">by Hassan Amin</p>
             </div>
           </motion.div>
 
@@ -63,8 +64,8 @@ export default function Home() {
             transition={{ delay: 0.2 }}
             className="text-center mb-8"
           >
-            <h2 className="text-3xl font-bold text-foreground mb-4">
-              Check Weather Anywhere
+            <h2 className="text-5xl font-bold text-foreground mb-4">
+              Check Weather Anywhere.
             </h2>
             <p className="text-muted mb-8 font-medium">
               Enter a city, ZIP code, coordinates, or landmark to get current weather and 5-day forecast
@@ -147,7 +148,9 @@ export default function Home() {
                         className="flex flex-col items-center p-4 bg-background rounded-lg border border-subtle text-center"
                       >
                         <p className="text-sm text-muted mb-1">{new Date(day.date).toLocaleDateString('en-US', { weekday: 'short' })}</p>
-                        <img src={`https:${day.icon}`} alt={day.description} className="w-12 h-12 mb-2" />
+                        <div className="text-4xl mb-2">
+                          {getWeatherIcon(day.icon, `${day.date} 12:00:00`)}
+                        </div>
                         <p className="text-lg font-bold text-foreground">{day.temperature.max}°C</p>
                         <p className="text-sm text-muted">{day.temperature.min}°C</p>
                         <p className="text-xs text-muted mt-1">{day.description}</p>
