@@ -18,6 +18,20 @@ export interface WeatherData {
     description: string;
     icon: string;
   }>;
+  hourly?: Array<{
+    time: string;
+    temperature: number;
+    feelsLike: number;
+    humidity: number;
+    pressure: number;
+    windSpeed: number;
+    windDirection: number;
+    description: string;
+    icon: string;
+    precipitation: number;
+    visibility: number;
+    uvIndex: number;
+  }>;
 }
 
 export interface LocationData {

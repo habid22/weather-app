@@ -207,6 +207,23 @@ export class WeatherService {
       localTime: data.location.localtime,
     };
 
+    // Extract hourly data from the first day (today)
+    const todayForecast = data.forecast.forecastday[0];
+    const hourlyData = todayForecast?.hour?.slice(0, 24).map((hour: any) => ({
+      time: hour.time.split(' ')[1], // Extract time part (HH:MM)
+      temperature: Math.round(hour.temp_c),
+      feelsLike: Math.round(hour.feelslike_c),
+      humidity: hour.humidity,
+      pressure: hour.pressure_mb,
+      windSpeed: Math.round((hour.wind_kph / 3.6) * 10) / 10, // Convert km/h to m/s
+      windDirection: hour.wind_degree,
+      description: hour.condition.text,
+      icon: hour.condition.icon,
+      precipitation: hour.precip_mm || 0,
+      visibility: hour.vis_km || 10,
+      uvIndex: hour.uv || 0,
+    })) || [];
+
     const weatherData: WeatherData = {
       current: {
         temperature: Math.round(data.current.temp_c),
@@ -227,6 +244,7 @@ export class WeatherService {
         description: day.day.condition.text,
         icon: day.day.condition.icon,
       })),
+      hourly: hourlyData,
     };
 
     return {

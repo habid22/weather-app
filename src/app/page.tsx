@@ -8,6 +8,7 @@ import WeatherDetails from '@/components/WeatherDetails';
 import ErrorDisplay from '@/components/ErrorDisplay';
 import WeatherRecordsManager from '@/components/WeatherRecordsManager';
 import Mapbox3DMap from '@/components/Mapbox3DMap';
+import HourlyForecast from '@/components/HourlyForecast';
 import { useLocation } from '@/hooks/useLocation';
 import { Cloud, Database } from 'lucide-react';
 
@@ -116,11 +117,23 @@ export default function Home() {
                   isLoading={isLoading}
                 />
                 
-                {/* 5-Day Forecast */}
+                {/* Hourly Forecast */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3, duration: 0.5 }}
+                >
+                  <HourlyForecast
+                    weather={weatherData}
+                    location={currentLocation.name}
+                  />
+                </motion.div>
+                
+                {/* 5-Day Forecast */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4, duration: 0.5 }}
                   className="bg-card p-6 rounded-xl shadow-lg border border-subtle"
                 >
                   <h3 className="text-2xl font-semibold text-foreground mb-6">5-Day Forecast</h3>
@@ -130,7 +143,7 @@ export default function Home() {
                         key={day.date}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.1 + 0.4 }}
+                        transition={{ delay: index * 0.1 + 0.5 }}
                         className="flex flex-col items-center p-4 bg-background rounded-lg border border-subtle text-center"
                       >
                         <p className="text-sm text-muted mb-1">{new Date(day.date).toLocaleDateString('en-US', { weekday: 'short' })}</p>
