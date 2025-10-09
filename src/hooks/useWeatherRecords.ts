@@ -113,7 +113,6 @@ export function useWeatherRecords(initialFilters: WeatherRecordFilters = {}) {
     location?: string;
     startDate?: string;
     endDate?: string;
-    updateWeatherData?: boolean;
   }) => {
     setLoading(true);
     setError(null);

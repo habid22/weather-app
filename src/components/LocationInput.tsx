@@ -70,13 +70,13 @@ export default function LocationInput({
               type="button"
               onClick={handleCurrentLocation}
               disabled={isGettingLocation || isLoading}
-              className="p-2 rounded-lg bg-card text-foreground border border-subtle hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+              className="p-2 rounded-lg bg-card text-foreground border border-subtle hover:bg-accent hover:border-primary/50 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 transition-all duration-200 group"
               title="Use current location"
             >
               {isGettingLocation ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <Loader2 className="w-4 h-4 animate-spin group-hover:text-primary transition-colors" />
               ) : (
-                <Navigation className="w-4 h-4" />
+                <Navigation className="w-4 h-4 group-hover:text-primary transition-colors" />
               )}
             </button>
           </div>

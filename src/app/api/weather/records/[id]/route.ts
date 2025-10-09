@@ -45,7 +45,7 @@ export async function PUT(
     
     const { id } = await params;
     const body = await request.json();
-    const { location, startDate, endDate, updateWeatherData = false } = body;
+    const { location, startDate, endDate } = body;
 
     // Find existing record
     const existingRecord = await WeatherRecord.findById(id);
@@ -67,29 +67,28 @@ export async function PUT(
         updateData.latitude = weatherResponse.location.latitude;
         updateData.longitude = weatherResponse.location.longitude;
         
-        if (updateWeatherData) {
-          updateData.temperatureData = {
-            current: weatherResponse.weather.current.temperature,
-            min: Math.min(...weatherResponse.weather.forecast.map(f => f.temperature.min)),
-            max: Math.max(...weatherResponse.weather.forecast.map(f => f.temperature.max)),
-            feelsLike: weatherResponse.weather.current.feelsLike,
-            humidity: weatherResponse.weather.current.humidity,
-            pressure: weatherResponse.weather.current.pressure,
-            windSpeed: weatherResponse.weather.current.windSpeed,
-            windDirection: weatherResponse.weather.current.windDirection,
-            description: weatherResponse.weather.current.description,
-            icon: weatherResponse.weather.current.icon
-          };
-          updateData.forecast = weatherResponse.weather.forecast.map(day => ({
-            date: new Date(day.date),
-            temperature: {
-              min: day.temperature.min,
-              max: day.temperature.max
-            },
-            description: day.description,
-            icon: day.icon
-          }));
-        }
+        // Always update weather data when location changes
+        updateData.temperatureData = {
+          current: weatherResponse.weather.current.temperature,
+          min: Math.min(...weatherResponse.weather.forecast.map(f => f.temperature.min)),
+          max: Math.max(...weatherResponse.weather.forecast.map(f => f.temperature.max)),
+          feelsLike: weatherResponse.weather.current.feelsLike,
+          humidity: weatherResponse.weather.current.humidity,
+          pressure: weatherResponse.weather.current.pressure,
+          windSpeed: weatherResponse.weather.current.windSpeed,
+          windDirection: weatherResponse.weather.current.windDirection,
+          description: weatherResponse.weather.current.description,
+          icon: weatherResponse.weather.current.icon
+        };
+        updateData.forecast = weatherResponse.weather.forecast.map(day => ({
+          date: new Date(day.date),
+          temperature: {
+            min: day.temperature.min,
+            max: day.temperature.max
+          },
+          description: day.description,
+          icon: day.icon
+        }));
       } catch (error: any) {
         return NextResponse.json(
           { success: false, error: `Invalid location: ${error.message}` },

@@ -4,7 +4,6 @@ export interface WeatherRecordData {
   location: string;
   startDate: string;
   endDate: string;
-  updateWeatherData?: boolean;
 }
 
 export interface WeatherRecordFilters {

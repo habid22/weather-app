@@ -34,9 +34,9 @@ export default function ErrorDisplay({ error, onRetry, onClear }: ErrorDisplayPr
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={onRetry}
-                className="flex items-center space-x-2 btn-primary"
+                className="flex items-center space-x-2 btn-primary hover:shadow-lg transition-all duration-200 group"
               >
-                <RefreshCw className="w-4 h-4" />
+                <RefreshCw className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" />
                 <span>Try Again</span>
               </motion.button>
             )}
@@ -46,7 +46,7 @@ export default function ErrorDisplay({ error, onRetry, onClear }: ErrorDisplayPr
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={onClear}
-                className="btn-secondary"
+                className="btn-secondary hover:shadow-lg transition-all duration-200"
               >
                 Dismiss
               </motion.button>

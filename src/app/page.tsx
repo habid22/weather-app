@@ -42,10 +42,10 @@ export default function Home() {
           >
             <button
               onClick={() => setShowRecordsManager(true)}
-              className="flex items-center space-x-2 px-4 py-2 bg-card rounded-lg border border-subtle hover:bg-accent transition-colors"
+              className="flex items-center space-x-2 px-4 py-2 bg-card rounded-lg border border-subtle hover:bg-accent hover:border-primary/50 hover:scale-105 transition-all duration-200 group"
             >
-              <Database className="w-4 h-4 text-foreground" />
-              <span className="text-foreground font-medium">Records</span>
+              <Database className="w-4 h-4 text-foreground group-hover:text-primary transition-colors" />
+              <span className="text-foreground font-medium group-hover:text-primary transition-colors">Records</span>
             </button>
           </motion.div>
 

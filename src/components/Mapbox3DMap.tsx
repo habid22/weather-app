@@ -159,26 +159,26 @@ export default function Mapbox3DMap({ location, latitude, longitude }: Mapbox3DM
         <div className="flex items-center space-x-2">
           <button
             onClick={resetView}
-            className="p-2 bg-background rounded-lg border border-subtle hover:border-primary/50 transition-colors"
+            className="p-2 bg-background rounded-lg border border-subtle hover:border-primary/50 hover:bg-primary/5 hover:scale-105 transition-all duration-200 group"
             title="Reset view"
           >
-            <RotateCcw className="w-4 h-4 text-foreground" />
+            <RotateCcw className="w-4 h-4 text-foreground group-hover:text-primary transition-colors" />
           </button>
           <button
             onClick={toggleFullscreen}
-            className="p-2 bg-background rounded-lg border border-subtle hover:border-primary/50 transition-colors"
+            className="p-2 bg-background rounded-lg border border-subtle hover:border-primary/50 hover:bg-primary/5 hover:scale-105 transition-all duration-200 group"
             title="Fullscreen"
           >
-            <Maximize2 className="w-4 h-4 text-foreground" />
+            <Maximize2 className="w-4 h-4 text-foreground group-hover:text-primary transition-colors" />
           </button>
           <a
             href={`https://www.mapbox.com/maps/${latitude},${longitude}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center space-x-1 text-primary hover:text-primary/80 text-sm font-medium"
+            className="flex items-center space-x-1 text-primary hover:text-primary/80 hover:bg-primary/5 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105 group"
           >
             <span>Open in Maps</span>
-            <ExternalLink className="w-3 h-3" />
+            <ExternalLink className="w-3 h-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
           </a>
         </div>
       </div>

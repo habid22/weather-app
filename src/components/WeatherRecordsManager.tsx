@@ -44,6 +44,7 @@ export default function WeatherRecordsManager({ onClose }: WeatherRecordsManager
   const [showFilters, setShowFilters] = useState(false);
   const [editingRecord, setEditingRecord] = useState<WeatherRecord | null>(null);
   const [selectedRecord, setSelectedRecord] = useState<WeatherRecord | null>(null);
+  const [deleteConfirmRecord, setDeleteConfirmRecord] = useState<WeatherRecord | null>(null);
   const [formData, setFormData] = useState({
     location: '',
     startDate: '',
@@ -53,8 +54,7 @@ export default function WeatherRecordsManager({ onClose }: WeatherRecordsManager
   const [editFormData, setEditFormData] = useState({
     location: '',
     startDate: '',
-    endDate: '',
-    updateWeatherData: false
+    endDate: ''
   });
 
   const handleCreateRecord = async (e: React.FormEvent) => {
@@ -89,8 +89,7 @@ export default function WeatherRecordsManager({ onClose }: WeatherRecordsManager
     setEditFormData({
       location: record.location,
       startDate: startDateStr,
-      endDate: endDateStr,
-      updateWeatherData: false
+      endDate: endDateStr
     });
     setEditingRecord(record);
   };
@@ -103,21 +102,25 @@ export default function WeatherRecordsManager({ onClose }: WeatherRecordsManager
       await updateRecord(editingRecord._id, {
         location: editFormData.location,
         startDate: editFormData.startDate,
-        endDate: editFormData.endDate,
-        updateWeatherData: editFormData.updateWeatherData
+        endDate: editFormData.endDate
       });
       setEditingRecord(null);
-      setEditFormData({ location: '', startDate: '', endDate: '', updateWeatherData: false });
+      setEditFormData({ location: '', startDate: '', endDate: '' });
     } catch (error) {
       // Error is handled by the hook
     }
   };
 
 
-  const handleDeleteRecord = async (id: string) => {
-    if (confirm('Are you sure you want to delete this weather record?')) {
+  const handleDeleteRecord = (record: WeatherRecord) => {
+    setDeleteConfirmRecord(record);
+  };
+
+  const confirmDeleteRecord = async () => {
+    if (deleteConfirmRecord) {
       try {
-        await deleteRecord(id);
+        await deleteRecord(deleteConfirmRecord._id);
+        setDeleteConfirmRecord(null);
       } catch (error) {
         // Error is handled by the hook
       }
@@ -158,22 +161,22 @@ export default function WeatherRecordsManager({ onClose }: WeatherRecordsManager
           <div className="flex items-center space-x-2">
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="p-2 rounded-lg bg-background border border-subtle hover:bg-accent transition-colors"
+              className="p-2 rounded-lg bg-background border border-subtle hover:bg-accent hover:border-primary/50 hover:scale-105 transition-all duration-200 group"
             >
-              <Filter className="w-4 h-4" />
+              <Filter className="w-4 h-4 group-hover:text-primary transition-colors" />
             </button>
             <button
               onClick={() => setShowCreateForm(true)}
-              className="p-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+              className="p-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 hover:scale-105 transition-all duration-200 group"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform" />
             </button>
             {onClose && (
               <button
                 onClick={onClose}
-                className="p-2 rounded-lg bg-background border border-subtle hover:bg-accent transition-colors"
+                className="p-2 rounded-lg bg-background border border-subtle hover:bg-accent hover:border-primary/50 hover:scale-105 transition-all duration-200 group"
               >
-                <X className="w-4 h-4" />
+                <X className="w-4 h-4 group-hover:text-primary group-hover:rotate-90 transition-all" />
               </button>
             )}
           </div>
@@ -245,7 +248,7 @@ export default function WeatherRecordsManager({ onClose }: WeatherRecordsManager
               <div className="text-muted mb-4">No weather records found</div>
               <button
                 onClick={() => setShowCreateForm(true)}
-                className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+                className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 hover:scale-105 transition-all duration-200 group"
               >
                 Create First Record
               </button>
@@ -278,24 +281,24 @@ export default function WeatherRecordsManager({ onClose }: WeatherRecordsManager
                     <div className="flex items-center space-x-1">
                       <button
                         onClick={() => setSelectedRecord(record)}
-                        className="p-1 rounded hover:bg-accent transition-colors"
+                        className="p-1 rounded hover:bg-accent hover:scale-110 transition-all duration-200 group"
                         title="View details"
                       >
-                        <Eye className="w-4 h-4 text-muted" />
+                        <Eye className="w-4 h-4 text-muted group-hover:text-primary transition-colors" />
                       </button>
                       <button
                         onClick={() => handleEditRecord(record)}
-                        className="p-1 rounded hover:bg-accent transition-colors"
+                        className="p-1 rounded hover:bg-accent hover:scale-110 transition-all duration-200 group"
                         title="Edit record"
                       >
-                        <Edit className="w-4 h-4 text-muted" />
+                        <Edit className="w-4 h-4 text-muted group-hover:text-primary transition-colors" />
                       </button>
                       <button
-                        onClick={() => handleDeleteRecord(record._id)}
-                        className="p-1 rounded hover:bg-destructive/10 transition-colors"
+                        onClick={() => handleDeleteRecord(record)}
+                        className="p-1 rounded hover:bg-destructive/10 hover:scale-110 transition-all duration-200 group"
                         title="Delete record"
                       >
-                        <Trash2 className="w-4 h-4 text-destructive" />
+                        <Trash2 className="w-4 h-4 text-destructive group-hover:text-destructive/80 transition-colors" />
                       </button>
                     </div>
                   </div>
@@ -349,7 +352,7 @@ export default function WeatherRecordsManager({ onClose }: WeatherRecordsManager
               <button
                 onClick={() => updateFilters({ ...filters, page: pagination.page - 1 })}
                 disabled={pagination.page <= 1}
-                className="px-3 py-1 rounded bg-background border border-subtle disabled:opacity-50 disabled:cursor-not-allowed hover:bg-accent transition-colors"
+                className="px-3 py-1 rounded bg-background border border-subtle disabled:opacity-50 disabled:cursor-not-allowed hover:bg-accent hover:border-primary/50 hover:scale-105 disabled:hover:scale-100 transition-all duration-200"
               >
                 Previous
               </button>
@@ -359,7 +362,7 @@ export default function WeatherRecordsManager({ onClose }: WeatherRecordsManager
               <button
                 onClick={() => updateFilters({ ...filters, page: pagination.page + 1 })}
                 disabled={pagination.page >= pagination.pages}
-                className="px-3 py-1 rounded bg-background border border-subtle disabled:opacity-50 disabled:cursor-not-allowed hover:bg-accent transition-colors"
+                className="px-3 py-1 rounded bg-background border border-subtle disabled:opacity-50 disabled:cursor-not-allowed hover:bg-accent hover:border-primary/50 hover:scale-105 disabled:hover:scale-100 transition-all duration-200"
               >
                 Next
               </button>
@@ -444,14 +447,14 @@ export default function WeatherRecordsManager({ onClose }: WeatherRecordsManager
                     <button
                       type="button"
                       onClick={() => setShowCreateForm(false)}
-                      className="px-4 py-2 rounded-lg bg-background border border-subtle hover:bg-accent transition-colors"
+                      className="px-4 py-2 rounded-lg bg-background border border-subtle hover:bg-accent hover:border-primary/50 hover:scale-105 transition-all duration-200"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
                       disabled={loading}
-                      className="px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors"
+                      className="px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 transition-all duration-200"
                     >
                       {loading ? 'Creating...' : 'Create Record'}
                     </button>
@@ -536,32 +539,19 @@ export default function WeatherRecordsManager({ onClose }: WeatherRecordsManager
                     </div>
                   )}
 
-                  {/* Update Weather Data Option */}
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      id="updateWeatherData"
-                      checked={editFormData.updateWeatherData}
-                      onChange={(e) => setEditFormData({ ...editFormData, updateWeatherData: e.target.checked })}
-                      className="rounded border border-subtle"
-                    />
-                    <label htmlFor="updateWeatherData" className="text-sm text-foreground">
-                      Update weather data (fetch fresh data from API)
-                    </label>
-                  </div>
                   
                   <div className="flex items-center justify-end space-x-3">
                     <button
                       type="button"
                       onClick={() => setEditingRecord(null)}
-                      className="px-4 py-2 rounded-lg bg-background border border-subtle hover:bg-accent transition-colors"
+                      className="px-4 py-2 rounded-lg bg-background border border-subtle hover:bg-accent hover:border-primary/50 hover:scale-105 transition-all duration-200"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
                       disabled={loading}
-                      className="px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors"
+                      className="px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 transition-all duration-200"
                     >
                       {loading ? 'Updating...' : 'Update Record'}
                     </button>
@@ -588,9 +578,9 @@ export default function WeatherRecordsManager({ onClose }: WeatherRecordsManager
                   </h3>
                   <button
                     onClick={() => setSelectedRecord(null)}
-                    className="p-2 rounded-lg bg-background border border-subtle hover:bg-accent transition-colors"
+                    className="p-2 rounded-lg bg-background border border-subtle hover:bg-accent hover:border-primary/50 hover:scale-105 transition-all duration-200 group"
                   >
-                    <X className="w-4 h-4" />
+                    <X className="w-4 h-4 group-hover:text-primary group-hover:rotate-90 transition-all" />
                   </button>
                 </div>
                 <div className="p-6 overflow-y-auto max-h-[70vh]">
@@ -657,6 +647,65 @@ export default function WeatherRecordsManager({ onClose }: WeatherRecordsManager
                       )}
                     </div>
                   )}
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* Delete Confirmation Modal */}
+        <AnimatePresence>
+          {deleteConfirmRecord && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-60">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="bg-card rounded-xl shadow-2xl border border-subtle w-full max-w-md"
+              >
+                <div className="p-6">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <div className="p-2 bg-destructive/10 rounded-lg">
+                      <Trash2 className="w-6 h-6 text-destructive" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-foreground">Delete Weather Record</h3>
+                      <p className="text-sm text-muted">This action cannot be undone</p>
+                    </div>
+                  </div>
+                  
+                  <div className="mb-6">
+                    <p className="text-foreground mb-2">
+                      Are you sure you want to delete the weather record for:
+                    </p>
+                    <div className="bg-background rounded-lg p-3 border border-subtle">
+                      <div className="flex items-center space-x-2 mb-1">
+                        <MapPin className="w-4 h-4 text-primary" />
+                        <span className="font-medium text-foreground">{deleteConfirmRecord.location}</span>
+                      </div>
+                      <div className="text-sm text-muted">
+                        {formatDate(deleteConfirmRecord.dateRange.start)} - {formatDate(deleteConfirmRecord.dateRange.end)}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-end space-x-3">
+                    <button
+                      type="button"
+                      onClick={() => setDeleteConfirmRecord(null)}
+                      className="px-4 py-2 rounded-lg bg-background border border-subtle hover:bg-accent hover:border-primary/50 hover:scale-105 transition-all duration-200"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={confirmDeleteRecord}
+                      disabled={loading}
+                      className="px-4 py-2 rounded-lg bg-destructive text-destructive-foreground hover:bg-destructive/90 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 transition-all duration-200"
+                    >
+                      {loading ? 'Deleting...' : 'Delete Record'}
+                    </button>
+                  </div>
                 </div>
               </motion.div>
             </div>
