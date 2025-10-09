@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
 import { LocationData, WeatherData } from '@/types/weather';
 import { getWeatherIcon, getWeatherGradient, getWeatherDescription } from '@/lib/weatherUtils';
 
@@ -11,12 +12,23 @@ interface WeatherCardProps {
 }
 
 export default function WeatherCard({ location, weather, isLoading = false }: WeatherCardProps) {
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Update time every minute
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 60000); // Update every minute
+
+    return () => clearInterval(timer);
+  }, []);
+
   if (isLoading) {
     return <WeatherCardSkeleton />;
   }
 
   const gradient = getWeatherGradient(weather.current.description);
-  const icon = getWeatherIcon(weather.current.icon);
+  const icon = getWeatherIcon(weather.current.icon, location.localTime, location.timezone);
   const description = getWeatherDescription(weather.current.description);
 
   return (
@@ -34,17 +46,41 @@ export default function WeatherCard({ location, weather, isLoading = false }: We
       
       {/* Content */}
       <div className="relative z-10 p-8 text-foreground">
-        {/* Location */}
+        {/* Location and Local Time */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
-          className="mb-6"
+          className="mb-6 flex justify-between items-start"
         >
-          <h1 className="text-2xl font-semibold mb-1">{location.name}</h1>
-          <p className="text-muted text-sm font-medium">
-            {location.state && `${location.state}, `}{location.country}
-          </p>
+          <div>
+            <h1 className="text-2xl font-semibold mb-1">{location.name}</h1>
+            <p className="text-muted text-sm font-medium">
+              {location.state && `${location.state}, `}{location.country}
+            </p>
+          </div>
+          
+          {/* Local Time */}
+          {location.timezone && (
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3 }}
+              className="text-right"
+            >
+              <div className="text-lg font-semibold text-foreground">
+                {currentTime.toLocaleTimeString('en-US', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  hour12: true,
+                  timeZone: location.timezone
+                })}
+              </div>
+              <div className="text-xs text-muted font-medium">
+                Local Time
+              </div>
+            </motion.div>
+          )}
         </motion.div>
 
         {/* Main Weather Info */}

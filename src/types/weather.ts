@@ -26,6 +26,8 @@ export interface LocationData {
   longitude: number;
   country: string;
   state?: string;
+  timezone?: string;
+  localTime?: string;
 }
 
 export interface WeatherApiResponse {

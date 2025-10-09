@@ -1,4 +1,35 @@
-export function getWeatherIcon(iconCode: string): string {
+// Function to determine if it's day or night based on local time
+export function isDayTime(localTime: string, timezone?: string): boolean {
+  try {
+    const now = new Date();
+    let localDateTime: Date;
+    
+    if (timezone) {
+      // Use the timezone to get the local time
+      const localTimeString = now.toLocaleString('en-US', { timeZone: timezone });
+      localDateTime = new Date(localTimeString);
+    } else if (localTime) {
+      // Use the provided local time
+      localDateTime = new Date(localTime);
+    } else {
+      // Fallback to current time
+      localDateTime = now;
+    }
+    
+    const hour = localDateTime.getHours();
+    // Consider day time from 6 AM to 8 PM
+    return hour >= 6 && hour < 20;
+  } catch (error) {
+    // Fallback to current time if parsing fails
+    const hour = new Date().getHours();
+    return hour >= 6 && hour < 20;
+  }
+}
+
+export function getWeatherIcon(iconCode: string, localTime?: string, timezone?: string): string {
+  // Determine if it's day or night
+  const isDay = isDayTime(localTime || '', timezone);
+  
   const iconMap: { [key: string]: string } = {
     // Clear sky
     '01d': '☀️', // clear sky day
@@ -6,38 +37,65 @@ export function getWeatherIcon(iconCode: string): string {
     
     // Few clouds
     '02d': '⛅', // few clouds day
-    '02n': '☁️', // few clouds night
+    '02n': '🌙☁️', // few clouds night
     
     // Scattered clouds
-    '03d': '☁️', // scattered clouds
-    '03n': '☁️', // scattered clouds
+    '03d': '⛅', // scattered clouds day
+    '03n': '☁️🌙', // scattered clouds night
     
     // Broken clouds
-    '04d': '☁️', // broken clouds
-    '04n': '☁️', // broken clouds
+    '04d': '☁️', // broken clouds day
+    '04n': '☁️🌙', // broken clouds night
     
     // Shower rain
     '09d': '🌦️', // shower rain
-    '09n': '🌦️', // shower rain
+    '09n': '🌧️🌙', // shower rain night
     
     // Rain
     '10d': '🌧️', // rain day
-    '10n': '🌧️', // rain night
+    '10n': '🌧️🌙', // rain night
     
     // Thunderstorm
     '11d': '⛈️', // thunderstorm
-    '11n': '⛈️', // thunderstorm
+    '11n': '⛈️🌙', // thunderstorm night
     
     // Snow
     '13d': '❄️', // snow
-    '13n': '❄️', // snow
+    '13n': '❄️🌙', // snow night
     
     // Mist
     '50d': '🌫️', // mist
-    '50n': '🌫️', // mist
+    '50n': '🌫️🌙', // mist night
   };
 
-  return iconMap[iconCode] || '🌤️';
+  // If we have a specific day/night icon code, use it
+  if (iconMap[iconCode]) {
+    return iconMap[iconCode];
+  }
+  
+  // If the icon code doesn't specify day/night, determine based on time
+  const baseIconCode = iconCode.replace(/[dn]$/, ''); // Remove 'd' or 'n' suffix
+  
+  // Map base conditions to appropriate day/night icons
+  const baseIconMap: { [key: string]: { day: string; night: string } } = {
+    '01': { day: '☀️', night: '🌙' }, // clear sky
+    '02': { day: '⛅', night: '🌙☁️' }, // few clouds
+    '03': { day: '⛅', night: '☁️🌙' }, // scattered clouds
+    '04': { day: '☁️', night: '☁️🌙' }, // broken clouds
+    '09': { day: '🌦️', night: '🌧️🌙' }, // shower rain
+    '10': { day: '🌧️', night: '🌧️🌙' }, // rain
+    '11': { day: '⛈️', night: '⛈️🌙' }, // thunderstorm
+    '13': { day: '❄️', night: '❄️🌙' }, // snow
+    '50': { day: '🌫️', night: '🌫️🌙' }, // mist
+  };
+  
+  const baseIcon = baseIconMap[baseIconCode];
+  if (baseIcon) {
+    return isDay ? baseIcon.day : baseIcon.night;
+  }
+  
+  // Fallback
+  return isDay ? '🌤️' : '🌙';
 }
 
 export function getWeatherGradient(description: string): string {

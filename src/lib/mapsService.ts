@@ -19,7 +19,7 @@ export class MapsService {
   }
 
   // Mapbox 3D GL JS configuration with your custom style
-  static getMapboxConfig(latitude: number, longitude: number, zoom: number = 17) {
+  static getMapboxConfig(latitude: number, longitude: number, zoom: number = 15.5) {
     const accessToken = 'pk.eyJ1Ijoiam9obmRvZTEzNTM1IiwiYSI6ImNtZ2loaDE1dDA5eGIyam9qdjE1eTg0anoifQ.76SPaHSDM6LyCpC9bm2L8w';
     
     return {

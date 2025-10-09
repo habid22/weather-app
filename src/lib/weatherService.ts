@@ -73,6 +73,8 @@ export class WeatherService {
             longitude: dayData.location.lon,
             country: dayData.location.country,
             state: dayData.location.region,
+            timezone: dayData.location.tz_id,
+            localTime: dayData.location.localtime,
           };
         }
         
@@ -201,6 +203,8 @@ export class WeatherService {
       longitude: data.location.lon,
       country: data.location.country,
       state: data.location.region,
+      timezone: data.location.tz_id,
+      localTime: data.location.localtime,
     };
 
     const weatherData: WeatherData = {

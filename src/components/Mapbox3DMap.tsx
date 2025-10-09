@@ -32,7 +32,7 @@ export default function Mapbox3DMap({ location, latitude, longitude }: Mapbox3DM
           container: mapContainer.current!,
           style: 'mapbox://styles/johndoe13535/cmgihixjc002501s6643v08wv',
           center: [longitude, latitude],
-          zoom: 17, // Building level detail
+          zoom: 15.5, // Building level detail
           pitch: 45, // 3D tilt
           bearing: 0,
           antialias: true,
@@ -50,27 +50,33 @@ export default function Mapbox3DMap({ location, latitude, longitude }: Mapbox3DM
 
         // Add 3D terrain
         map.current.on('load', () => {
-          // Add terrain source
-          map.current.addSource('mapbox-dem', {
-            type: 'raster-dem',
-            url: 'mapbox://mapbox.mapbox-terrain-dem-v1',
-            tileSize: 512,
-            maxzoom: 14
-          });
+          // Check if terrain source already exists before adding
+          if (!map.current.getSource('mapbox-dem')) {
+            // Add terrain source
+            map.current.addSource('mapbox-dem', {
+              type: 'raster-dem',
+              url: 'mapbox://mapbox.mapbox-terrain-dem-v1',
+              tileSize: 512,
+              maxzoom: 14
+            });
+          }
 
           // Add terrain layer
           map.current.setTerrain({ source: 'mapbox-dem', exaggeration: 1.5 });
 
-          // Add sky layer for atmosphere
-          map.current.addLayer({
-            id: 'sky',
-            type: 'sky',
-            paint: {
-              'sky-type': 'atmosphere',
-              'sky-atmosphere-sun': [0.0, 0.0],
-              'sky-atmosphere-sun-intensity': 15
-            }
-          });
+          // Check if sky layer already exists before adding
+          if (!map.current.getLayer('sky')) {
+            // Add sky layer for atmosphere
+            map.current.addLayer({
+              id: 'sky',
+              type: 'sky',
+              paint: {
+                'sky-type': 'atmosphere',
+                'sky-atmosphere-sun': [0.0, 0.0],
+                'sky-atmosphere-sun-intensity': 15
+              }
+            });
+          }
 
           setIsLoaded(true);
         });
@@ -92,6 +98,10 @@ export default function Mapbox3DMap({ location, latitude, longitude }: Mapbox3DM
     // Cleanup
     return () => {
       if (map.current) {
+        // Remove all event listeners
+        map.current.off('load');
+        map.current.off('error');
+        // Remove the map instance
         map.current.remove();
         map.current = null;
       }
@@ -102,7 +112,7 @@ export default function Mapbox3DMap({ location, latitude, longitude }: Mapbox3DM
     if (map.current) {
       map.current.flyTo({
         center: [longitude, latitude],
-        zoom: 17, // Building level detail
+        zoom: 15.5, // Building level detail
         pitch: 45,
         bearing: 0,
         duration: 1000
