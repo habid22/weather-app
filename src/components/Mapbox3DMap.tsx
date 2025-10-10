@@ -54,41 +54,52 @@ export default function Mapbox3DMap({ location, latitude, longitude }: Mapbox3DM
 
         // Add 3D terrain
         map.current.on('load', () => {
-          // Check if terrain source already exists before adding
-          if (!map.current.getSource('mapbox-dem')) {
-            // Add terrain source
-            map.current.addSource('mapbox-dem', {
-              type: 'raster-dem',
-              url: 'mapbox://mapbox.mapbox-terrain-dem-v1',
-              tileSize: 512,
-              maxzoom: 14
-            });
+          try {
+            // Check if terrain source already exists before adding
+            if (!map.current.getSource('mapbox-dem')) {
+              // Add terrain source
+              map.current.addSource('mapbox-dem', {
+                type: 'raster-dem',
+                url: 'mapbox://mapbox.mapbox-terrain-dem-v1',
+                tileSize: 512,
+                maxzoom: 14
+              });
+            }
+
+            // Add terrain layer
+            map.current.setTerrain({ source: 'mapbox-dem', exaggeration: 1.5 });
+
+            // Check if sky layer already exists before adding
+            if (!map.current.getLayer('sky')) {
+              // Add sky layer for atmosphere
+              map.current.addLayer({
+                id: 'sky',
+                type: 'sky',
+                paint: {
+                  'sky-type': 'atmosphere',
+                  'sky-atmosphere-sun': [0.0, 0.0],
+                  'sky-atmosphere-sun-intensity': 15
+                }
+              });
+            }
+
+            setIsLoaded(true);
+          } catch (terrainError) {
+            console.warn('Terrain features not available, using basic map:', terrainError);
+            setIsLoaded(true); // Still show the map without 3D features
           }
-
-          // Add terrain layer
-          map.current.setTerrain({ source: 'mapbox-dem', exaggeration: 1.5 });
-
-          // Check if sky layer already exists before adding
-          if (!map.current.getLayer('sky')) {
-            // Add sky layer for atmosphere
-            map.current.addLayer({
-              id: 'sky',
-              type: 'sky',
-              paint: {
-                'sky-type': 'atmosphere',
-                'sky-atmosphere-sun': [0.0, 0.0],
-                'sky-atmosphere-sun-intensity': 15
-              }
-            });
-          }
-
-          setIsLoaded(true);
         });
 
         // Handle errors
         map.current.on('error', (e: any) => {
           console.error('Map error:', e);
-          setError('Failed to load 3D map');
+          console.error('Error details:', {
+            message: e.message,
+            type: e.type,
+            source: e.source,
+            layer: e.layer
+          });
+          setError('Failed to load map. Please check your Mapbox configuration.');
         });
 
       } catch (err: any) {
@@ -143,7 +154,19 @@ export default function Mapbox3DMap({ location, latitude, longitude }: Mapbox3DM
       >
         <div className="text-center py-8">
           <MapPin className="w-12 h-12 text-muted mx-auto mb-4" />
-          <p className="text-muted">{error}</p>
+          <p className="text-muted mb-4">{error}</p>
+          <div className="text-sm text-muted">
+            <p>Location: {location}</p>
+            <p>Coordinates: {latitude.toFixed(4)}, {longitude.toFixed(4)}</p>
+            <a 
+              href={`https://www.google.com/maps?q=${latitude},${longitude}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:text-primary/80 underline"
+            >
+              Open in Google Maps
+            </a>
+          </div>
         </div>
       </motion.div>
     );

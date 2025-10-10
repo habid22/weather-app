@@ -11,7 +11,8 @@ import Mapbox3DMap from '@/components/Mapbox3DMap';
 import HourlyForecast from '@/components/HourlyForecast';
 import { useLocation } from '@/hooks/useLocation';
 import { getWeatherIcon } from '@/lib/weatherUtils';
-import { Cloud, Database, Info } from 'lucide-react';
+import { LandmarkService } from '@/lib/landmarks';
+import { Cloud, Database, Info, Star, MapPin } from 'lucide-react';
 
 export default function Home() {
   const { currentLocation, weatherData, isLoading, error, searchLocation, getCurrentLocation, clearError } = useLocation();
@@ -76,6 +77,39 @@ export default function Home() {
               onCurrentLocation={getCurrentLocation}
               isLoading={isLoading}
             />
+            
+            {/* Popular Landmarks */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="mt-8"
+            >
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <Star className="w-5 h-5 text-primary" />
+                <h3 className="text-lg font-semibold text-foreground">Popular Landmarks</h3>
+              </div>
+              <div className="flex flex-wrap justify-center gap-2 max-w-4xl mx-auto">
+                {LandmarkService.getLandmarksByCategory('monument').slice(0, 6).map((landmark, index) => (
+                  <motion.button
+                    key={landmark.name}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.5 + index * 0.1 }}
+                    onClick={() => searchLocation(`${landmark.name}, ${landmark.city}, ${landmark.country}`)}
+                    className="flex items-center gap-2 px-3 py-2 bg-card border border-subtle rounded-lg hover:bg-accent hover:border-primary/50 hover:scale-105 transition-all duration-200 group"
+                  >
+                    <MapPin className="w-3 h-3 text-primary group-hover:text-primary transition-colors" />
+                    <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
+                      {landmark.name}
+                    </span>
+                    <span className="text-xs text-muted">
+                      {landmark.city}
+                    </span>
+                  </motion.button>
+                ))}
+              </div>
+            </motion.div>
           </motion.div>
 
           {/* Error Display */}
