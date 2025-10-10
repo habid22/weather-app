@@ -297,7 +297,6 @@ export class WeatherService {
     const locationData: LocationData = {
       name: locationName || data.location.name,
       country: data.location.country,
-      region: data.location.region,
       latitude: latitude, // Use the original landmark coordinates
       longitude: longitude, // Use the original landmark coordinates
       timezone: data.location.tz_id,
