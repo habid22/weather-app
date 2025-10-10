@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { WeatherApiResponse, WeatherData, LocationData } from '@/types/weather';
-import { LandmarkService } from './landmarks';
 
 const WEATHER_API_KEY = process.env.NEXT_PUBLIC_WEATHER_API_KEY;
 const BASE_URL = 'https://api.weatherapi.com/v1';
@@ -193,31 +192,6 @@ export class WeatherService {
       throw new Error('Weather API key is not configured');
     }
 
-    // Check if the location is a landmark (try different variations)
-    let landmark = LandmarkService.getLandmarkByName(location);
-    
-    // If not found, try searching by the first part (before comma)
-    if (!landmark && location.includes(',')) {
-      const firstPart = location.split(',')[0].trim();
-      landmark = LandmarkService.getLandmarkByName(firstPart);
-    }
-    
-    // If still not found, try searching in the landmarks list
-    if (!landmark) {
-      const searchResults = LandmarkService.searchLandmarks(location);
-      if (searchResults.length > 0) {
-        landmark = searchResults[0]; // Use the first match
-      }
-    }
-    
-    if (landmark) {
-      console.log('Landmark detected:', landmark.name);
-      // Use coordinates for landmark searches to ensure accurate results
-      const coordinateLocation = `${landmark.latitude},${landmark.longitude}`;
-      console.log('Using landmark coordinates:', coordinateLocation);
-      return this.getWeatherByCoordinates(landmark.latitude, landmark.longitude, landmark.name);
-    }
-
     // Use forecast.json endpoint which includes both current weather and forecast
     const url = `${BASE_URL}/forecast.json?key=${WEATHER_API_KEY}&q=${encodeURIComponent(location)}&days=5`;
     console.log('Making request to:', url.replace(WEATHER_API_KEY, 'HIDDEN_KEY'));
@@ -262,69 +236,6 @@ export class WeatherService {
         icon: data.current.condition.icon,
       },
       forecast: data.forecast.forecastday.slice(0, 5).map((day: any) => ({
-        date: day.date,
-        temperature: {
-          min: Math.round(day.day.mintemp_c),
-          max: Math.round(day.day.maxtemp_c),
-        },
-        description: day.day.condition.text,
-        icon: day.day.condition.icon,
-      })),
-      hourly: hourlyData,
-    };
-
-    return {
-      location: locationData,
-      weather: weatherData,
-    };
-  }
-
-  static async getWeatherByCoordinates(latitude: number, longitude: number, locationName?: string): Promise<{ location: LocationData; weather: WeatherData }> {
-    console.log('WeatherService.getWeatherByCoordinates called with:', { latitude, longitude, locationName });
-    
-    if (!WEATHER_API_KEY) {
-      console.error('Weather API key is not configured');
-      throw new Error('Weather API key is not configured');
-    }
-
-    // Use coordinates for the API call
-    const coordinateLocation = `${latitude},${longitude}`;
-    const url = `${BASE_URL}/forecast.json?key=${WEATHER_API_KEY}&q=${coordinateLocation}&days=5`;
-    console.log('Making request to:', url.replace(WEATHER_API_KEY, 'HIDDEN_KEY'));
-    const data = await this.makeRequest<any>(url);
-
-    // Transform the API response to our format
-    const locationData: LocationData = {
-      name: locationName || data.location.name,
-      country: data.location.country,
-      latitude: latitude, // Use the original landmark coordinates
-      longitude: longitude, // Use the original landmark coordinates
-      timezone: data.location.tz_id,
-    };
-
-    // Extract hourly data for the next 24 hours
-    const hourlyData = data.forecast.forecastday[0].hour.map((hour: any) => ({
-      time: hour.time,
-      temperature: Math.round(hour.temp_c),
-      condition: hour.condition.text,
-      icon: hour.condition.icon,
-      humidity: hour.humidity,
-      windSpeed: hour.wind_kph,
-      windDirection: hour.wind_degree,
-    }));
-
-    const weatherData: WeatherData = {
-      current: {
-        temperature: Math.round(data.current.temp_c),
-        feelsLike: Math.round(data.current.feelslike_c),
-        humidity: data.current.humidity,
-        pressure: data.current.pressure_mb,
-        windSpeed: data.current.wind_kph,
-        windDirection: data.current.wind_degree,
-        description: data.current.condition.text,
-        icon: data.current.condition.icon,
-      },
-      forecast: data.forecast.forecastday.map((day: any) => ({
         date: day.date,
         temperature: {
           min: Math.round(day.day.mintemp_c),

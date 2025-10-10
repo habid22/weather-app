@@ -8,8 +8,7 @@ A comprehensive weather application built with Next.js, TypeScript, and MongoDB 
 - **Real-time Weather Data**: Get current weather conditions for any location
 - **5-Day Forecast**: Extended weather predictions with detailed information
 - **Historical Weather**: Access past weather data for specific date ranges
-- **Multiple Location Input**: Support for zip codes, coordinates, cities, and more
-- **Famous Landmarks**: Search and get weather for 30+ famous landmarks worldwide
+- **Multiple Location Input**: Support for zip codes, coordinates, landmarks, cities, and more
 - **Current Location**: Automatic weather detection based on GPS coordinates
 
 ### Advanced Features
@@ -91,19 +90,14 @@ A comprehensive weather application built with Next.js, TypeScript, and MongoDB 
    - Zip code (e.g., "10001")
    - City name (e.g., "New York")
    - Coordinates (e.g., "40.7128, -74.0060")
-   - Famous landmarks (e.g., "Eiffel Tower", "Big Ben", "Taj Mahal")
+   - Landmarks (e.g., "Times Square")
 
-2. **Use landmark suggestions**:
-   - Type landmark names to see autocomplete suggestions
-   - Click on popular landmarks displayed on the homepage
-   - Browse landmarks by category (monuments, buildings, natural, etc.)
-
-3. **View current weather** with detailed information including:
+2. **View current weather** with detailed information including:
    - Temperature, humidity, pressure
    - Wind speed and direction
    - Weather description and icons
 
-4. **Check 5-day forecast** for extended planning
+3. **Check 5-day forecast** for extended planning
 
 ### Managing Weather Data
 1. **Save weather data** by clicking the save button
@@ -118,22 +112,13 @@ A comprehensive weather application built with Next.js, TypeScript, and MongoDB 
 
 ## 🔧 API Endpoints
 
-### Weather Endpoints
 - `GET /api/weather` - Get current weather by location
 - `GET /api/weather/coordinates` - Get weather by coordinates
-- `GET /api/weather/records` - Get saved weather data
+- `GET /api/weather/records` - Get saved weather history
 - `POST /api/weather/records` - Save new weather data
 - `PUT /api/weather/records/[id]` - Update weather record
 - `DELETE /api/weather/records/[id]` - Delete weather record
 - `GET /api/weather/records/export` - Export weather data
-
-### Landmark Endpoints
-- `GET /api/landmarks` - Get landmarks (supports search, category, random)
-- `GET /api/landmarks?q=eiffel` - Search landmarks by name
-- `GET /api/landmarks?category=monument` - Get landmarks by category
-- `GET /api/landmarks?limit=5` - Get random landmarks
-
-### Other Endpoints
 - `GET /api/location/maps` - Get map data
 - `GET /api/location/youtube` - Get location videos
 
