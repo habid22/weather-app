@@ -68,7 +68,7 @@ export default function Home() {
               Check Weather Anywhere.
             </h2>
             <p className="text-muted mb-8 font-medium">
-              Enter a city, ZIP code, coordinates, or landmark to get current weather and 5-day forecast
+              Enter a city, ZIP code, or coordinates to get current weather and 5-day forecast
             </p>
             
             <LocationInput

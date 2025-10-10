@@ -399,7 +399,7 @@ export default function WeatherRecordsManager({ onClose }: WeatherRecordsManager
                       type="text"
                       value={formData.location}
                       onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                      placeholder="Enter city, coordinates, or landmark..."
+                      placeholder="Enter city or coordinates..."
                       className="w-full p-3 rounded-lg bg-background border border-subtle text-foreground"
                       required
                     />
@@ -494,7 +494,7 @@ export default function WeatherRecordsManager({ onClose }: WeatherRecordsManager
                       type="text"
                       value={editFormData.location}
                       onChange={(e) => setEditFormData({ ...editFormData, location: e.target.value })}
-                      placeholder="Enter city, coordinates, or landmark..."
+                      placeholder="Enter city or coordinates..."
                       className="w-full p-3 rounded-lg bg-background border border-subtle text-foreground"
                       required
                     />

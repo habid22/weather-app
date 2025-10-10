@@ -8,7 +8,7 @@ A comprehensive weather application built with Next.js, TypeScript, and MongoDB 
 - **Real-time Weather Data**: Get current weather conditions for any location
 - **5-Day Forecast**: Extended weather predictions with detailed information
 - **Historical Weather**: Access past weather data for specific date ranges
-- **Multiple Location Input**: Support for zip codes, coordinates, landmarks, cities, and more
+- **Multiple Location Input**: Support for zip codes, coordinates, cities, and more
 - **Current Location**: Automatic weather detection based on GPS coordinates
 
 ### Advanced Features
@@ -90,7 +90,6 @@ A comprehensive weather application built with Next.js, TypeScript, and MongoDB 
    - Zip code (e.g., "10001")
    - City name (e.g., "New York")
    - Coordinates (e.g., "40.7128, -74.0060")
-   - Landmarks (e.g., "Times Square")
 
 2. **View current weather** with detailed information including:
    - Temperature, humidity, pressure

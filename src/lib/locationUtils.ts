@@ -1,6 +1,6 @@
 export interface LocationValidationResult {
   isValid: boolean;
-  type: 'city' | 'zip' | 'coordinates' | 'landmark' | 'unknown';
+  type: 'city' | 'zip' | 'coordinates' | 'unknown';
   normalizedInput: string;
   error?: string;
 }
@@ -78,25 +78,6 @@ export class LocationValidator {
       };
     }
 
-    // Check for landmark patterns (contains common landmark keywords)
-    const landmarkKeywords = [
-      'square', 'bridge', 'tower', 'park', 'plaza', 'center', 'centre',
-      'station', 'airport', 'university', 'college', 'hospital', 'mall',
-      'stadium', 'theater', 'theatre', 'museum', 'library', 'church',
-      'cathedral', 'temple', 'mosque', 'synagogue', 'palace', 'castle'
-    ];
-    
-    const isLandmark = landmarkKeywords.some(keyword => 
-      trimmed.toLowerCase().includes(keyword)
-    );
-
-    if (isLandmark) {
-      return {
-        isValid: true,
-        type: 'landmark',
-        normalizedInput: trimmed
-      };
-    }
 
     // Default to city/location
     if (trimmed.length >= 2) {
@@ -121,8 +102,6 @@ export class LocationValidator {
         return '📍';
       case 'zip':
         return '📮';
-      case 'landmark':
-        return '🏛️';
       case 'city':
         return '🏙️';
       default:
@@ -136,8 +115,6 @@ export class LocationValidator {
         return 'Coordinates (latitude, longitude)';
       case 'zip':
         return 'ZIP/Postal Code';
-      case 'landmark':
-        return 'Landmark or Point of Interest';
       case 'city':
         return 'City or Location';
       default:
